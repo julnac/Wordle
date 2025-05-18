@@ -10,38 +10,6 @@ This project is a Wordle application that utilizes three databases: MongoDB for 
 - **PostgreSQL**: Relational database for managing user data and rankings.
 - **Redis**: In-memory data structure store for caching and session management.
 
-## Project Structure
-```
-wordle-app
-├── src
-│   ├── app.js
-│   ├── config
-│   │   ├── mongodb.js
-│   │   ├── postgresql.js
-│   │   └── redis.js
-│   ├── controllers
-│   │   ├── authController.js
-│   │   ├── gameController.js
-│   │   └── rankingController.js
-│   ├── models
-│   │   ├── playerStats.js
-│   │   ├── user.js
-│   │   └── wordList.js
-│   ├── routes
-│   │   ├── authRoutes.js
-│   │   ├── gameRoutes.js
-│   │   └── rankingRoutes.js
-│   ├── services
-│   │   ├── cacheService.js
-│   │   ├── gameService.js
-│   │   └── rankingService.js
-│   └── utils
-│       └── helpers.js
-├── package.json
-├── .env
-├── .gitignore
-└── README.md
-```
 
 ## Setup Instructions
 1. Clone the repository:

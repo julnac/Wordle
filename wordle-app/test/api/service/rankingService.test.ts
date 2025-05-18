@@ -1,4 +1,4 @@
-const RankingServiceClass = require('../../../src/api/services/rankingService');
+import RankingServiceClass from '../../../src/api/services/rankingService';
 
 jest.mock('../../../src/repository/pgsql/models/user', () => ({
   find: jest.fn(() => ({
@@ -25,7 +25,7 @@ jest.mock('../../../src/api/services/cacheService', () => {
 });
 
 describe('RankingService', () => {
-  let rankingService;
+  let rankingService: InstanceType<typeof RankingServiceClass>;
 
   beforeEach(() => {
     jest.clearAllMocks();

@@ -1,13 +1,25 @@
-// const GameService = require('./cacheService');
-const WordList = require('../../repository/mongo/models/wordList');
-const PlayerStats = require('../../repository/mongo/models/playerStats');
+import WordList from '../../repository/mongo/models/wordList';
+import PlayerStats from '../../repository/mongo/models/playerStats';
+
+interface Game {
+  word: string;
+  attempts: string[];
+  status: 'ongoing' | 'completed';
+}
+
+interface GuessResult {
+  isCorrect: boolean;
+  attemptsLeft: number;
+}
 
 class GameService {
+  private currentGame: Game | null;
+
   constructor() {
     this.currentGame = null;
   }
 
-  startGame() {
+  startGame(): Game {
     const word = this.getRandomWord();
     this.currentGame = {
       word,
@@ -17,12 +29,12 @@ class GameService {
     return this.currentGame;
   }
 
-  getRandomWord() {
+  getRandomWord(): string {
     // Logic to fetch a random word from the MongoDB word list
     return WordList.getRandomWord();
   }
 
-  submitGuess(guess) {
+  submitGuess(guess: string): GuessResult {
     if (!this.currentGame) {
       throw new Error('No game in progress');
     }
@@ -37,7 +49,10 @@ class GameService {
     return result;
   }
 
-  checkGuess(guess) {
+  checkGuess(guess: string): GuessResult {
+    if (!this.currentGame) {
+      throw new Error('No game in progress');
+    }
     const isCorrect = guess === this.currentGame.word;
     return {
       isCorrect,
@@ -45,14 +60,17 @@ class GameService {
     };
   }
 
-  getAttemptsLeft() {
+  getAttemptsLeft(): number {
+    if (!this.currentGame) {
+      throw new Error('No game in progress');
+    }
     const maxAttempts = 6; // Example max attempts
     return maxAttempts - this.currentGame.attempts.length;
   }
 
-  resetGame() {
+  resetGame(): void {
     this.currentGame = null;
   }
 }
 
-module.exports = GameService;
+export default GameService;

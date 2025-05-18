@@ -1,15 +1,17 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
-const pool = new Pool({
+dotenv.config();
+
+const pool: Pool = new Pool({
   user: process.env.PG_USER,
   host: process.env.PG_HOST,
   database: process.env.PG_DATABASE,
   password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
+  port: process.env.PG_PORT ? Number(process.env.PG_PORT) : undefined,
 });
 
-const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
   try {
     await pool.connect();
     console.log('Connected to PostgreSQL database');
@@ -19,7 +21,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = {
-  pool,
-  connectDB,
-};
+export { pool, connectDB };
