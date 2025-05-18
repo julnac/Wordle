@@ -1,6 +1,6 @@
-const GameService = require('../services/cacheService');
-const WordList = require('../models/wordList');
-const PlayerStats = require('../models/playerStats');
+// const GameService = require('./cacheService');
+const WordList = require('../../repository/mongo/models/wordList');
+const PlayerStats = require('../../repository/mongo/models/playerStats');
 
 class GameService {
   constructor() {

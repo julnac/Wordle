@@ -1,10 +1,13 @@
-const RankingService = require('../models/playerStats');
-const User = require('../models/user');
+// const RankingService = require('../../repository/models/playerStats');
+const User = require('../../repository/pgsql/models/user');
 const CacheService = require('./cacheService');
+const redisClient = require('../app');
+const MongoRepository = require('../../repository/mongo/mongoRepository');
 
 class RankingService {
   constructor() {
-    this.cacheService = new CacheService();
+    this.cacheService = new CacheService(redisClient);
+    this.mongoRepository = new MongoRepository();
   }
 
   async getRankings() {
@@ -19,7 +22,7 @@ class RankingService {
   }
 
   async updateRanking(userId, score) {
-    const playerStats = await RankingService.findOne({ userId });
+    const playerStats = await PlayerStats.findOne({ userId });
     if (playerStats) {
       playerStats.score = score;
       await playerStats.save();

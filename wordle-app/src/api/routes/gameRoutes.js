@@ -8,7 +8,7 @@ const gameController = new GameController();
 router.post('/start', gameController.startGame);
 
 // Route to submit a guess
-router.post('/guess', gameController.submitGuess);
+router.post('/guess', gameController.validateGuess);
 
 // Route to get game status
 router.get('/status/:gameId', gameController.getGameStatus);

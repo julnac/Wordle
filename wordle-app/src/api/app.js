@@ -5,9 +5,9 @@ const redis = require('redis');
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const rankingRoutes = require('./routes/rankingRoutes');
-const mongodbConfig = require('./config/mongodb');
-const postgresqlConfig = require('./config/postgresql');
-const redisConfig = require('./config/redis');
+const mongodbConfig = require('../mongo/mongodb');
+const postgresqlConfig = require('../pgsql/postgresql');
+const redisConfig = require('../redis/redis');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,3 +29,5 @@ app.use('/api/ranking', rankingRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+module.exports = redisClient;
