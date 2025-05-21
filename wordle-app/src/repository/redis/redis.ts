@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from 'redis';
 
-const redisClient: RedisClientType = createClient({
+export const redisClient: RedisClientType = createClient({
   socket: {
     host: process.env.REDIS_HOST || 'localhost',
     port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
@@ -20,4 +20,4 @@ const connectRedis = async (): Promise<void> => {
   }
 };
 
-export { redisClient, connectRedis };
+export default connectRedis;

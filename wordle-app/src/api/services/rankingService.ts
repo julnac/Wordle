@@ -1,17 +1,16 @@
-// Plik: wordle-app/src/api/services/rankingService.ts
 import { User } from "../../repository/pgsql/models/user";
 import { CacheService } from "./cacheService";
 import { redisClient } from "../app";
-import { MongoRepository } from "../../repository/mongo/mongoRepository";
+import { PlayerStatsRepository } from "../../repository/mongo/playerStatsRepository";
 import type { PlayerStats } from "../../repository/mongo/models/playerStats";
 
-export class RankingService {
+export default class RankingService {
   private cacheService: CacheService;
-  private mongoRepository: MongoRepository;
+  private mongoRepository: PlayerStatsRepository;
 
   constructor() {
     this.cacheService = new CacheService(redisClient);
-    this.mongoRepository = new MongoRepository();
+    this.mongoRepository = new PlayerStatsRepository();
   }
 
   async getRankings(): Promise<any[]> {

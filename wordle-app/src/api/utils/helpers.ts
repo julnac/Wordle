@@ -1,4 +1,3 @@
-// filepath: wordle-app/wordle-app/src/utils/helpers.ts
 export const validateWord = (word: string): boolean => {
   const wordPattern = /^[a-zA-Z]{5}$/; // Only allows 5-letter words
   return wordPattern.test(word);

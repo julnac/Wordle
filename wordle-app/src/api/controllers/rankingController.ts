@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import { RankingService } from "../services/rankingService";
 
-export class RankingController {
+export default class RankingController {
   private rankingService: RankingService;
 
   constructor() {

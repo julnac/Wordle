@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-export class AuthController {
+export default class AuthController {
     private userService: any;
 
     constructor(userService: any) {
