@@ -1,49 +1,56 @@
 import WordListRepository from '../../repository/mongo/wordListRepository';
+import CacheService from "./cacheService";
+import LeaderboardService from "./leaderboardService";
+import {v4 as uuidv4} from 'uuid';
+import StatsService from './statsService';
+import {Game} from "../types/Game";
+import {GuessResult} from "../types/GuessResult";
+import {LetterValidation} from "../types/LetterValidation";
 
-export interface Game {
-  word: string;
-  wordLength: number;
-  attempts: string[];
-  attemptsAllowed: number;
-  status: 'ongoing' | 'completed';
-  level?: 'easy' | 'medium' | 'hard';
-  language: string;
-}
-
-interface LetterValidation {
-  letter: string;
-  status: 'correct' | 'present' | 'absent';
-}
-
-interface GuessResult {
-  isCorrect: boolean;
-  attemptsLeft: number;
-  letters: LetterValidation[];
-}
+const GAME_CACHE_PREFIX = 'game:';
+const GAME_CACHE_TTL = 3600;
 
 class GameService {
-  private currentGame: Game | null;
+  // private currentGame: Game | null;
+  // constructor() {
+  //   this.currentGame = null;
+  // }
+  private cacheService: CacheService;
+  private leaderboardService: LeaderboardService;
 
-  constructor() {
-    this.currentGame = null;
+  constructor(cacheService: CacheService, leaderboardService: LeaderboardService) {
+    this.cacheService = cacheService;
+    this.leaderboardService = leaderboardService;
+  }
+  // getCurrentGame(): Game | null {
+  //   return this.currentGame;
+  // }
+
+  private async getGameFromCache(gameId: string): Promise<Game | null> {
+    return this.cacheService.getCache<Game>(`${GAME_CACHE_PREFIX}${gameId}`);
   }
 
-  getCurrentGame(): Game | null {
-    return this.currentGame;
+  private async saveGameToCache(game: Game): Promise<void> {
+    await this.cacheService.setCache(`${GAME_CACHE_PREFIX}${game.id}`, game, GAME_CACHE_TTL);
   }
 
-  async startGame(attemptsAllowed: number = 6, wordLength: number = 5, language: string, level?: 'easy' | 'medium' | 'hard'): Promise<Game> {
+  async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string, level?: 'easy' | 'medium' | 'hard'): Promise<Game> {
     const word = await this.getRandomWord(wordLength, language, level);
-    this.currentGame = {
+    const gameId = uuidv4();
+    const newGame: Game = {
+      id: gameId,
+      userId,
       word,
       wordLength,
       attempts: [],
       attemptsAllowed,
       status: 'ongoing',
       level,
-      language
+      language,
+      startTime: Date.now(),
     };
-    return this.currentGame;
+    await this.saveGameToCache(newGame);
+    return newGame;
   }
 
   async getRandomWord(wordLength: number, language: string, level?: 'easy' | 'medium' | 'hard'): Promise<string> {
@@ -55,67 +62,87 @@ class GameService {
     }
   }
 
-  async submitGuess(guess: string): Promise<GuessResult> {
-    if (!this.currentGame) {
-      throw new Error('No game in progress');
+  async submitGuess(gameId: string, guess: string): Promise<GuessResult> {
+    const game = await this.getGameFromCache(gameId);
+
+    if (!game) {
+      throw new Error('Game not found or session expired');
     }
-    if (!await WordListRepository.doesWordExist(guess, this.currentGame.language)) {
+    if (game.status !== 'ongoing') {
+      throw new Error('Game is already completed or failed');
+    }
+    if (guess.length !== game.wordLength) {
+      throw new Error(`Guess length must be ${game.wordLength}`);
+    }
+    if (!await WordListRepository.doesWordExist(guess, game.language)) {
       throw new Error('No such word in the dictionary');
     }
 
-    this.currentGame.attempts.push(guess);
-    const result = this.checkGuess(guess);
+    game.attempts.push(guess);
+    const validationResult = this.validateGuessInternal(guess, game.word);
+    const attemptsLeft = game.attemptsAllowed - game.attempts.length;
+    let isGameOver = false;
 
-    if (result.isCorrect) {
-      this.currentGame.status = 'completed';
+    if (validationResult.isCorrect) {
+      game.status = 'completed';
+      game.endTime = Date.now();
+      isGameOver = true;
+      // Logika zapisu do statystyk gracza
+      await StatsService.updateStats(game);
+      // Logika zapisu do rankingu
+      await this.leaderboardService.addScore(game);
+    } else if (attemptsLeft <= 0) {
+      game.status = 'failed';
+      game.endTime = Date.now();
+      isGameOver = true;
     }
 
-    return result;
-  }
+    await this.saveGameToCache(game);
 
-  checkGuess(guess: string): GuessResult {
-    if (!this.currentGame) {
-      throw new Error('No game in progress');
-    }
-    const isCorrect = guess === this.currentGame.word;
     return {
-      isCorrect,
-      attemptsLeft: this.getAttemptsLeft(),
-      letters: this.validateLetters(guess)
+      gameId: game.id,
+      isCorrect: validationResult.isCorrect,
+      isGameOver,
+      attemptsLeft,
+      letters: validationResult.letters,
+      gameState: game,
     };
   }
 
-  validateLetters(guess: string): LetterValidation[] {
-    if (!this.currentGame) {
-      throw new Error('No game in progress');
-    }
+  private validateGuessInternal(guess: string, targetWord: string): { isCorrect: boolean; letters: LetterValidation[] } {
+    const isCorrect = guess === targetWord;
     const letters: LetterValidation[] = [];
-    const wordArray = this.currentGame.word.split('');
+    const wordArray = targetWord.split('');
+    const guessArray = guess.split('');
+    const tempWordArray = [...wordArray]; // Kopia do śledzenia użytych liter
 
-    for (let i = 0; i < guess.length; i++) {
-      if (wordArray[i] === guess[i]) {
-        letters.push({ letter: guess[i], status: 'correct' });
-      } else if (wordArray.includes(guess[i])) {
-        letters.push({ letter: guess[i], status: 'present' });
-      } else {
-        letters.push({ letter: guess[i], status: 'absent' });
+    // Najpierw oznacz poprawne litery na właściwych pozycjach
+    for (let i = 0; i < guessArray.length; i++) {
+      if (guessArray[i] === wordArray[i]) {
+        letters[i] = { letter: guessArray[i], status: 'correct' };
+        tempWordArray[i] = ''; // Oznacz jako zużytą
       }
     }
 
-    return letters;
-  }
+    // Następnie oznacz litery obecne, ale na złych pozycjach
+    for (let i = 0; i < guessArray.length; i++) {
+      if (letters[i]) continue; // Już oznaczona jako 'correct'
 
-  getAttemptsLeft(): number {
-    if (!this.currentGame) {
-      throw new Error('No game in progress');
+      const charIndexInWord = tempWordArray.indexOf(guessArray[i]);
+      if (charIndexInWord !== -1) {
+        letters[i] = { letter: guessArray[i], status: 'present' };
+        tempWordArray[charIndexInWord] = ''; // Oznacz jako zużytą
+      } else {
+        letters[i] = { letter: guessArray[i], status: 'absent' };
+      }
     }
-    const maxAttempts = this.currentGame.attemptsAllowed;
-    return maxAttempts - this.currentGame.attempts.length;
+    return { isCorrect, letters };
   }
 
-  resetGame(): void {
-    this.currentGame = null;
+  async getGameStatus(gameId: string): Promise<Game | null> {
+    return this.getGameFromCache(gameId);
   }
+
 }
 
 export default GameService;

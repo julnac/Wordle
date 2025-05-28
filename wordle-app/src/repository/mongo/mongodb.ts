@@ -6,13 +6,13 @@ const mongoURI: string = process.env.MONGODB_URI || 'mongodb://localhost:27017/w
 let dbInstance: Db | null = null;
 
 const connectMongoDB = async (): Promise<void> => {
+  console.log('Wywołano connectMongoDB');
   if (dbInstance) {
     console.log('MongoDB is already connected.');
     return;
   }
   try {
     await mongoose.connect(mongoURI, {
-      // @ts-expect-error: Opcje są kompatybilne, ale typy mogą się różnić między wersjami mongoose
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -26,6 +26,7 @@ const connectMongoDB = async (): Promise<void> => {
 
 // Funkcja do pobierania instancji bazy danych
 export const getDb = (): Db => {
+  console.log('Wywołano getDb');
   if (!dbInstance) {
     throw new Error('Database not connected. Call connectMongoDB first.');
   }

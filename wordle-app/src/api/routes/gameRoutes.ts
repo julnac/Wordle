@@ -1,19 +1,92 @@
 import express, { Router } from 'express';
 import GameController from '../controllers/gameController';
+import GameService from '../services/gameService';
+import CacheService from '../services/cacheService';
+import LeaderboardService from "../services/leaderboardService";
+import { redisClient } from '../../repository/redis/redis';
+// import {authenticateToken} from "../middleware/authMiddleware";
 
 const router: Router = express.Router();
-const gameController = new GameController();
 
-// Route to start a new game
-// Oczekuje teraz np. { "attemptsAllowed": 6, "wordLength": 5, "language": "pl", "level": "medium" } w req.body
-router.post('/start', gameController.startGame);
+const cacheService = new CacheService(redisClient);
+const leaderboardService = new LeaderboardService(cacheService);
+const gameService = new GameService(cacheService, leaderboardService);
+const gameController = new GameController(gameService, cacheService);
 
-// Route to submit a guess
-// Oczekuje np. { "guess": "slowo" } w req.body
-router.post('/guess', gameController.validateGuess);
+/**
+ * @openapi
+ * /api/game/start/{userId}:
+ *   post:
+ *     summary: Rozpocznij nową grę
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               attemptsAllowed:
+ *                 type: integer
+ *               wordLength:
+ *                 type: integer
+ *               language:
+ *                 type: string
+ *               level:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Gra została rozpoczęta
+ */
+router.post('/start/:userId',(req, res) => gameController.startGame(req, res));
 
-// Route to get game status (bez zmian, jeśli gameId identyfikuje grę)
-router.get('/status/:gameId', gameController.getGameStatus);
+/**
+ * @openapi
+ * /api/game/guess/{gameId}:
+ *   post:
+ *     summary: Prześlij próbę odgadnięcia słowa
+ *     parameters:
+ *       - in: path
+ *         name: gameId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               guess:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Wynik próby
+ */
+router.post('/guess/:gameId', (req, res) => gameController.validateGuess(req, res));
+
+/**
+ * @openapi
+ * /api/game/status/{gameId}:
+ *   get:
+ *     summary: Pobierz status gry
+ *     parameters:
+ *       - in: path
+ *         name: gameId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Status gry
+ */
+router.get('/status/:gameId', (req, res) => gameController.getGameStatus(req, res));
 
 export default router;
 

@@ -13,8 +13,7 @@
     "allowJs": false
   },
   "include": [
-    "./src/**/*",
-    "./test/**/*"
+    "./src/**/*"
   ],
   "exclude": [
     "node_modules",

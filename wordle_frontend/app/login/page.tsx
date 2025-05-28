@@ -1,30 +1,127 @@
 import Link from "next/link";
 
 export default function Login() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 sm:p-20">
-      <h1 className="text-4xl font-bold mb-8">Login</h1>
-      <form className="flex flex-col gap-4 w-full max-w-md">
-        <input
-          type="email"
-          placeholder="Email"
-          className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button className="rounded-full bg-blue-500 text-white py-3 px-6 font-medium hover:bg-blue-600">
-          Login
-        </button>
-      </form>
-      <p className="mt-4 text-gray-600">
-        Don't have an account?{" "}
-        <Link href="/signup" className="text-blue-500 hover:underline">
-          Sign Up
-        </Link>
-      </p>
-    </div>
-  );
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen p-8 sm:p-20">
+            <h1 className="text-4xl font-bold mb-8">Sign Up</h1>
+            <form className="flex flex-col gap-4 w-full max-w-md">
+                <input
+                    type="text"
+                    placeholder="Username"
+                    className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button className="rounded-full bg-green-500 text-white py-3 px-6 font-medium hover:bg-green-600">
+                    Sign Up
+                </button>
+            </form>
+            <p className="mt-4 text-gray-600">
+                Already have an account?{" "}
+                <Link href="/login" className="text-blue-500 hover:underline">
+                    Login
+                </Link>
+            </p>
+        </div>
+    );
 }
+// "use client";
+//
+// import Link from "next/link";
+// import { useKeycloak } from "../components/KeycloakProvider";
+// import { useRouter } from 'next/navigation';
+// import { useEffect } from "react";
+//
+// export default function Login() {
+//     const { keycloak, authenticated, profile } = useKeycloak();
+//     const router = useRouter();
+//
+//     useEffect(() => {
+//         if (authenticated && keycloak?.authenticated) { // Sprawdź oba dla pewności
+//             // Jeśli użytkownik jest już zalogowany, przekieruj go np. na stronę główną
+//             // lub stronę profilu, zamiast pokazywać formularz logowania.
+//             // Możesz to dostosować do swoich potrzeb.
+//             console.log("User already authenticated, redirecting...");
+//             router.push('/'); // Przekieruj na stronę główną
+//         }
+//     }, [authenticated, keycloak, router]);
+//
+//     const handleLogin = () => {
+//         if (keycloak && !keycloak.authenticated) {
+//             keycloak.login(); // Przekierowuje na stronę logowania Keycloak
+//         }
+//     };
+//
+//     const handleLogout = () => {
+//         if (keycloak && keycloak.authenticated) {
+//             keycloak.logout({ redirectUri: window.location.origin + '/login' }); // Przekieruj na stronę logowania po wylogowaniu
+//         }
+//     };
+//
+//     const handleRegister = () => {
+//         if (keycloak) {
+//             keycloak.register();
+//         }
+//     }
+//
+//     if (!keycloak) {
+//         return <div>Loading Keycloak...</div>; // Lub inny wskaźnik ładowania
+//     }
+//
+//     if (authenticated) {
+//         return (
+//             <div className="flex flex-col items-center justify-center min-h-screen p-8 sm:p-20">
+//                 <h1 className="text-3xl font-bold mb-4">Welcome, {profile?.username || 'User'}!</h1>
+//                 <p className="mb-2">You are already logged in.</p>
+//                 {profile?.email && <p className="mb-4 text-sm text-gray-600">Email: {profile.email}</p>}
+//                 {keycloak.hasRealmRole('app_admin') && (
+//                     <p className="text-green-600 font-semibold mb-4">You have admin privileges.</p>
+//                 )}
+//                 <button
+//                     onClick={handleLogout}
+//                     className="rounded-full bg-red-500 text-white py-3 px-6 font-medium hover:bg-red-600 mb-4"
+//                 >
+//                     Logout
+//                 </button>
+//                 <Link href="/" className="text-blue-500 hover:underline">
+//                     Go to Homepage
+//                 </Link>
+//             </div>
+//         );
+//     }
+//
+//     return (
+//         <div className="flex flex-col items-center justify-center min-h-screen p-8 sm:p-20">
+//             <h1 className="text-4xl font-bold mb-8">Login or Register</h1>
+//             {/* Usunęliśmy stary formularz, ponieważ Keycloak obsługuje UI logowania */}
+//             <div className="flex flex-col gap-4 w-full max-w-xs">
+//                 <button
+//                     onClick={handleLogin}
+//                     className="rounded-full bg-blue-500 text-white py-3 px-6 font-medium hover:bg-blue-600"
+//                 >
+//                     Login with Keycloak
+//                 </button>
+//                 <button
+//                     onClick={handleRegister}
+//                     className="rounded-full bg-green-500 text-white py-3 px-6 font-medium hover:bg-green-600"
+//                 >
+//                     Register with Keycloak
+//                 </button>
+//             </div>
+//             <p className="mt-6 text-gray-600">
+//                 Proceed to{" "}
+//                 <Link href="/" className="text-blue-500 hover:underline">
+//                     Homepage
+//                 </Link>
+//             </p>
+//         </div>
+//     );
+// }

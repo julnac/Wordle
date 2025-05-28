@@ -1,30 +1,27 @@
 import {jest} from '@jest/globals';
-import RankingService from '../../../src/api/services/rankingService';
+import StatsService from '../../../src/api/services/statsService';
 import CacheService from '../../../src/api/services/cacheService';
 import { PlayerStatsRepository } from '../../../src/repository/mongo/playerStatsRepository';
-import { PlayerStats } from '../../../src/repository/mongo/models/playerStats';
-// Importujemy User tylko po to, by TypeScript wiedział o typie, ale będziemy mockować jego implementację
-// import { User } from '../../../src/repository/pgsql/models/user';
 
 // Mockowanie zależności
 jest.mock('../../../src/api/services/cacheService');
 jest.mock('../../../src/repository/mongo/playerStatsRepository');
 
 // Definicja mocków dla User.find().sort().limit()
-// RankingService oczekuje, że User będzie miał te metody
+// StatsService oczekuje, że User będzie miał te metody
 const mockUserLimit = jest.fn();
 const mockUserSort = jest.fn(() => ({ limit: mockUserLimit }));
 const mockUserFind = jest.fn(() => ({ sort: mockUserSort }));
 
 jest.mock('../../../src/repository/pgsql/models/user', () => ({
   __esModule: true, // Ważne dla modułów ES6
-  User: { // RankingService importuje { User } i wywołuje User.find()
+  User: { // StatsService importuje { User } i wywołuje User.find()
     find: mockUserFind,
   },
 }));
 
 // Mockowanie redisClient, ponieważ CacheService jest od niego zależny
-// a RankingService tworzy instancję CacheService
+// a StatsService tworzy instancję CacheService
 jest.mock('../../../src/api/app', () => ({
   redisClient: { // Dostarczamy podstawowy mock obiektu redisClient
     setex: jest.fn(),
@@ -34,7 +31,7 @@ jest.mock('../../../src/api/app', () => ({
 }));
 
 describe('RankingService', () => {
-  let rankingService: RankingService;
+  let rankingService: StatsService;
   let mockCacheServiceInstance: jest.Mocked<CacheService>;
   let mockMongoRepositoryInstance: jest.Mocked<PlayerStatsRepository>;
 
@@ -50,16 +47,16 @@ describe('RankingService', () => {
 
     // Tworzenie instancji mocków, które zostaną wstrzyknięte lub użyte
     // CacheService i PlayerStatsRepository są mockowane na poziomie modułu,
-    // więc `new CacheService()` i `new PlayerStatsRepository()` w konstruktorze RankingService
+    // więc `new CacheService()` i `new PlayerStatsRepository()` w konstruktorze StatsService
     // użyją tych mocków.
-    rankingService = new RankingService();
+    rankingService = new StatsService();
 
     // Aby mieć dostęp do instancji mocków i ich metod (np. .mockResolvedValue)
     // musimy je "wyciągnąć" z instancji rankingService lub użyć mocków konstruktorów.
-    // Ponieważ RankingService tworzy własne instancje,
+    // Ponieważ StatsService tworzy własne instancje,
     // musimy upewnić się, że nasze testy odnoszą się do tych konkretnych instancji mocków.
     // Najprostszym sposobem jest przypisanie nowych instancji mocków do rankingService,
-    // ale to wymagałoby zmiany modyfikatorów dostępu w RankingService lub użycia `as any`.
+    // ale to wymagałoby zmiany modyfikatorów dostępu w StatsService lub użycia `as any`.
     // Alternatywnie, możemy mockować metody na prototypach, jeśli są one używane.
 
     // W tym przypadku, ponieważ `CacheService` i `PlayerStatsRepository` są mockowane globalnie
@@ -68,10 +65,10 @@ describe('RankingService', () => {
     // ale bezpieczniej jest przypisać je bezpośrednio, jeśli to możliwe,
     // lub upewnić się, że nasze asercje odnoszą się do mocków globalnych.
 
-    // RankingService tworzy `new CacheService(redisClient)` i `new PlayerStatsRepository()`.
+    // StatsService tworzy `new CacheService(redisClient)` i `new PlayerStatsRepository()`.
     // `CacheService` i `PlayerStatsRepository` są już zamockowane.
     // Musimy upewnić się, że metody na tych zamockowanych instancjach są tym, czego oczekujemy.
-    // `CacheService.mock.instances[0]` da nam dostęp do instancji utworzonej w konstruktorze RankingService.
+    // `CacheService.mock.instances[0]` da nam dostęp do instancji utworzonej w konstruktorze StatsService.
     // Podobnie dla PlayerStatsRepository.
 
     // Dla uproszczenia i bezpośredniej kontroli, przypiszemy mocki do instancji rankingService.
@@ -82,7 +79,7 @@ describe('RankingService', () => {
     // `CacheService` jest klasą, więc `new CacheService()` zwróci mocka.
     // `PlayerStatsRepository` jest klasą, więc `new PlayerStatsRepository()` zwróci mocka.
 
-    // Pobieramy instancje mocków, które zostały utworzone wewnątrz konstruktora RankingService
+    // Pobieramy instancje mocków, które zostały utworzone wewnątrz konstruktora StatsService
     // Zakładamy, że `jest.mock` poprawnie zamienia konstruktory
     mockCacheServiceInstance = (CacheService as jest.MockedClass<typeof CacheService>).mock.instances[0] as jest.Mocked<CacheService>;
     mockMongoRepositoryInstance = (PlayerStatsRepository as jest.MockedClass<typeof PlayerStatsRepository>).mock.instances[0] as jest.Mocked<PlayerStatsRepository>;
@@ -97,7 +94,7 @@ describe('RankingService', () => {
   describe('getRankings', () => {
     it('should return rankings from cache if available', async () => {
       const cachedRankings = [...sampleUserRankingData];
-      // RankingService używa metod get, set, del
+      // StatsService używa metod get, set, del
 
       // const result = await rankingService.getRankings();
 

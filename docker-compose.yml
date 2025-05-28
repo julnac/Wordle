@@ -11,14 +11,15 @@ services:
       - backend
 
   backend:
+    container_name: backend
     build:
-      context: ./wordle_backend
+      context: ./wordle-app
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGO_URI=mongodb://mongo:27017/wordle
+      - MONGODB_URI=mongodb://mongo:27017/wordle
       - POSTGRES_URI=postgresql://postgres:postgres@postgres:5432/wordle
       - REDIS_HOST=redis
     depends_on:
@@ -52,9 +53,30 @@ services:
     ports:
       - "6379:6379"
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.4
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin       # Domyślny użytkownik admin
+      KEYCLOAK_ADMIN_PASSWORD: admin # Domyślne hasło admina
+      # Możesz dodać import konfiguracji realmu przy starcie, jeśli masz plik eksportu
+      # DB_VENDOR: POSTGRES # Jeśli chcesz używać zewnętrznej bazy danych dla Keycloak
+      # DB_ADDR: postgres # Nazwa serwisu postgres
+      # DB_DATABASE: keycloak
+      # DB_USER: <user_dla_keycloak>
+      # DB_PASSWORD: <haslo_dla_keycloak>
+      # volumes:
+      # - ./path/to/your/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    command: start-dev # Dla dewelopmentu. Dla produkcji użyj 'start' i skonfiguruj bazę danych, HTTPS itp.
+    # depends_on: # Jeśli Keycloak ma używać Twojej instancji Postgres
+    #   - postgres
+
 volumes:
   mongo_data:
   postgres_data:
 
 
 # docker-compose up --build
+

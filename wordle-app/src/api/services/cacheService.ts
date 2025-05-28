@@ -1,27 +1,60 @@
-interface RedisClient {
-    setex(key: string, seconds: number, value: string): Promise<void>;
-    get(key: string): Promise<string | null>;
-    del(key: string): Promise<void>;
-}
+import { RedisClientType} from "redis";
+
+// interface RedisClient {
+//     setex(key: string, seconds: number, value: string): Promise<void>;
+//     get(key: string): Promise<string | null>;
+//     del(key: string): Promise<void>;
+// }
 
 class CacheService {
-    private redisClient: RedisClient;
+    private redisClient: RedisClientType;
 
-    constructor(redisClient: RedisClient) {
+    constructor(redisClient: RedisClientType) {
         this.redisClient = redisClient;
     }
 
     async setCache(key: string, value: unknown, expiration: number = 3600): Promise<void> {
-        await this.redisClient.setex(key, expiration, JSON.stringify(value));
+        await this.redisClient.setEx(key, expiration, JSON.stringify(value));
     }
 
     async getCache<T = unknown>(key: string): Promise<T | null> {
-        const data = await this.redisClient.get(key);
-        return data ? JSON.parse(data) as T : null;
+        const data: string | Buffer | null = await this.redisClient.get(key);
+        // const data = await this.redisClient.get(key);
+        if (data === null) {
+            return null;
+        }
+        // Sprawdź, czy data jest typu Buffer i przekonwertuj na string, jeśli tak
+        // const jsonData = typeof data === 'string' ? data : data.toString();
+        // const jsonData = typeof data === 'string' ? data : Buffer.isBuffer(data) ? data.toString() : null;
+        // if (!jsonData) {
+        //     throw new Error('Invalid cache data format');
+        // }
+        const jsonData = typeof data === 'string'
+            ? data
+            : Buffer.isBuffer(data)
+                ? (data as Buffer).toString()
+                : null;
+
+        if (!jsonData) {
+            throw new Error('Invalid cache data format');
+        }
+        return JSON.parse(jsonData) as T;
     }
 
     async deleteCache(key: string): Promise<void> {
         await this.redisClient.del(key);
+    }
+
+    async zAdd(key: string, score: number, member: string): Promise<void> {
+        await this.redisClient.zAdd(key, [{ score, value: member }]);
+    }
+
+    async zAddLT(key: string, score: number, member: string): Promise<void> {
+        await this.redisClient.zAdd(key, [{ score, value: member }], { LT: true });
+    }
+
+    async zRangeWithScores(key: string, start: number, stop: number): Promise<Array<{ value: string, score: number }>> {
+        return this.redisClient.zRangeWithScores(key, start, stop);
     }
 }
 

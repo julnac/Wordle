@@ -7,7 +7,7 @@ interface UploadResult {
     errors: { word: string, error: any }[];
 }
 
-export class UploadDictService {
+export default class UploadDictService {
 
     static async uploadWords(wordsData: IWordList[]): Promise<UploadResult> {
         let successfulUploads = 0;
@@ -43,5 +43,3 @@ export class UploadDictService {
     }
 
 }
-
-export default UploadDictService;
