@@ -20,12 +20,23 @@ export default class GameController {
                 return;
             }
 
-            if (!language || typeof wordLength !== 'number') {
-                res.status(400).json({ message: "Parametry 'language' (string) oraz 'wordLength' (number) są wymagane." });
+            if (attemptsAllowed && (typeof attemptsAllowed !== 'number' || attemptsAllowed <= 0 || attemptsAllowed > 10)) {
+                res.status(400).json({ message: "Parametr 'attemptsAllowed' (dodatnia liczba) jest opcjonalny, ale jeśli podany, musi być między 1 a 10." });
                 return;
             }
-            if (attemptsAllowed && (typeof attemptsAllowed !== 'number' || attemptsAllowed <= 0)) {
-                res.status(400).json({ message: "Parametr 'attemptsAllowed' (dodatnia liczba) jest opcjonalny, ale jeśli podany, musi być poprawny." });
+
+            if (wordLength && (typeof wordLength !== 'number' || wordLength < 4 || wordLength > 7)) {
+                res.status(400).json({message: "Parametr 'wordLength' (dodatnia liczba) jest opcjonalny, ale jeśli podany, musi być między 4 a 7."});
+                return;
+            }
+
+            if (language && !['pl', 'en', 'es', 'de'].includes(language)) {
+                res.status(400).json({ message: "Parametr 'language' musi być jednym z: pl, en, es, de." });
+                return;
+            }
+
+            if (level && !['easy', 'medium', 'hard'].includes(level)) {
+                res.status(400).json({ message: "Parametr 'level' musi być jednym z: easy, medium, hard." });
                 return;
             }
 
@@ -47,7 +58,7 @@ export default class GameController {
             const { gameId } = req.params as { gameId: string };
             const { guess } = req.body as { guess: string };
 
-            if (!guess) {
+            if (!guess || typeof guess !== 'string') {
                 res.status(400).json({ message: "Parametr 'guess' (string) jest wymagany." });
                 return;
             }

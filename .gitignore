@@ -3,6 +3,8 @@
 # dependencies
 /node_modules
 /wordle-app/node_modules
+/wordle-app/src/repository/pgsql/prisma/generated/
+/wordle-app/dist/
 /.pnp
 .pnp.*
 .yarn/*

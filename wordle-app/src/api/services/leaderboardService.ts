@@ -11,8 +11,8 @@ export default class LeaderboardService {
     }
 
     // Klucz dla rankingu, np. leaderboard:pl:easy
-    private getLeaderboardKey(language: string, difficulty?: string): string {
-        return `${LEADERBOARD_PREFIX}:${language}${difficulty ? `:${difficulty}` : ':any'}`;
+    private getLeaderboardKey(language?: string, difficulty?: string): string {
+        return `${LEADERBOARD_PREFIX}:${language ? `:${language}` : ':any'}${difficulty ? `:${difficulty}` : ':any'}`;
     }
 
     async addScore(game: Game): Promise<void> {
@@ -22,10 +22,8 @@ export default class LeaderboardService {
         // Wynik: liczba prób. Mniejsza liczba prób jest lepsza.
         // const attempt = game.attempts.length;
         const time = game.endTime - game.startTime; // Czas gry w milisekundach
-        const score = Math.floor(time / 1000);
-        // Członek: ID gracza lub unikalny identyfikator gry/gracza
-        const member = `${game.id}`; // Można rozważyć użycie ID użytkownika, jeśli jest
-        // const member = `${game.userId ?? game.id}`;
+        const score = Math.floor(time / 1000); // Wynik w sekundach
+        const member = `${game.userId ?? game.id}`;
 
         try {
             // Dodaj wynik do rankingu. Jeśli gracz już jest, zaktualizuj jeśli nowy wynik jest lepszy.
@@ -38,12 +36,19 @@ export default class LeaderboardService {
         }
     }
 
-    async getTopScores(language: string, difficulty?: string, count: number = 10): Promise<Array<{ member: string, score: number }>> {
+    async getTopScores(language?: string, difficulty?: string, count: number = 10): Promise<Array<{ member: string, score: string }>> {
         const key = this.getLeaderboardKey(language, difficulty);
         try {
             // Pobierz top N wyników (od najniższego do najwyższego)
             const results = await this.cacheService.zRangeWithScores(key, 0, count - 1);
-            return results.map(r => ({ member: r.value.toString(), score: Number(r.score) }));
+            return results.map(r => {
+                const totalSeconds = Number(r.score);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                const formatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                return { member: r.value.toString(), score: formatted };
+            });
+            // return results.map(r => ({ member: r.value.toString(), score: Number(r.score) }));
         } catch (error) {
             console.error(`Failed to get top scores from ${key}:`, error);
             return [];

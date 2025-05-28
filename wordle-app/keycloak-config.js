@@ -1,5 +1,5 @@
-import session from 'express-session';
-import Keycloak from 'keycloak-connect';
+const session = require('express-session');
+const Keycloak = require('keycloak-connect');
 
 // Konfiguracja sesji (wymagane przez keycloak-connect)
 const sessionConfig = {
@@ -11,15 +11,15 @@ const sessionConfig = {
 
 // Konfiguracja Keycloak
 const keycloakConfig = {
-    clientId: 'myclient', // Client ID z Keycloak
+    clientId: 'wordle-backend-client', // Client ID z Keycloak
     bearerOnly: false, // Ustaw na true, jeśli aplikacja tylko weryfikuje tokeny, a nie inicjuje logowania
-    serverUrl: 'http://localhost:8080/auth', // URL Twojego serwera Keycloak
+    serverUrl: 'http://keycloak:8080/auth', // URL Twojego serwera Keycloak
     realm: 'wordle-app-realm', // Nazwa Twojego realmu w Keycloak
     credentials: {
-        secret: 'twoj-client-secret' // Sekret klienta z Keycloak (jeśli Access Type to confidential)
+        secret: 'Muy5DgOnyOaZHKwL0rK65RpjHO6xQSIP' // Sekret klienta z Keycloak (jeśli Access Type to confidential)
     }
 };
 
 const keycloak = new Keycloak({ store: sessionConfig.store }, keycloakConfig);
 
-export { sessionConfig, keycloak };
+module.exports = { sessionConfig, keycloak };

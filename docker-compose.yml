@@ -15,16 +15,17 @@ services:
     build:
       context: ./wordle-app
       dockerfile: Dockerfile
+    volumes:
+      - ./wordle-app:/app
+    command: npx nodemon src/api/app.ts
     ports:
       - "5000:5000"
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://mongo:27017/wordle
-      - POSTGRES_URI=postgresql://postgres:postgres@postgres:5432/wordle
       - REDIS_HOST=redis
     depends_on:
       - mongo
-      - postgres
       - redis
 
   mongo:
@@ -43,7 +44,7 @@ services:
     environment:
       POSTGRES_USER: user123
       POSTGRES_PASSWORD: pass123
-      POSTGRES_DB: wordle
+      POSTGRES_DB: keycloak
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -52,6 +53,8 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.2.4
@@ -59,24 +62,22 @@ services:
     ports:
       - "8080:8080"
     environment:
-      KEYCLOAK_ADMIN: admin       # Domyślny użytkownik admin
-      KEYCLOAK_ADMIN_PASSWORD: admin # Domyślne hasło admina
-      # Możesz dodać import konfiguracji realmu przy starcie, jeśli masz plik eksportu
-      # DB_VENDOR: POSTGRES # Jeśli chcesz używać zewnętrznej bazy danych dla Keycloak
-      # DB_ADDR: postgres # Nazwa serwisu postgres
-      # DB_DATABASE: keycloak
-      # DB_USER: <user_dla_keycloak>
-      # DB_PASSWORD: <haslo_dla_keycloak>
-      # volumes:
-      # - ./path/to/your/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: user123
+      KC_DB_PASSWORD: pass123
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
     command: start-dev # Dla dewelopmentu. Dla produkcji użyj 'start' i skonfiguruj bazę danych, HTTPS itp.
-    # depends_on: # Jeśli Keycloak ma używać Twojej instancji Postgres
-    #   - postgres
+    depends_on:
+      - postgres
 
 volumes:
   mongo_data:
   postgres_data:
+  redis_data:
 
 
 # docker-compose up --build
-
+# docker-compose up --build backend

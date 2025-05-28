@@ -23,10 +23,12 @@ const dictionaryController = new DictionaryController();
  *               properties:
  *                 word:
  *                   type: string
+ *                 difficulty:
+ *                   type: string
  *                 language:
  *                   type: string
- *                 length:
- *                   type: integer
+ *                 category:
+ *                   type: string
  *     responses:
  *       200:
  *         description: Słowa zostały dodane
@@ -51,5 +53,27 @@ router.post('/upload', (req, res) => dictionaryController.uploadWords(req, res))
  *         description: Słowa zostały usunięte
  */
 router.delete('/language/:language', (req, res) => dictionaryController.deleteWordsByLanguage(req, res));
+
+/**
+ * @openapi
+ * /api/dictionary/upload/language/{language}:
+ *   post:
+ *     description: Automatycznie importuje słowa z pliku słownikowego dla wybranego języka do bazy danych.
+ *     parameters:
+ *       - in: path
+ *         name: language
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Kod języka (np. 'pl', 'en', 'es', 'de')
+ *     responses:
+ *       200:
+ *         description: Słowa zostały pomyślnie zaimportowane.
+ *       400:
+ *         description: Błędny parametr języka.
+ *       500:
+ *         description: Błąd serwera.
+ */
+router.post('/upload/language/:language', (req, res) => dictionaryController.uploadLanguage(req, res));
 
 export default router;

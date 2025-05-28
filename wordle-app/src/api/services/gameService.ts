@@ -34,7 +34,7 @@ class GameService {
     await this.cacheService.setCache(`${GAME_CACHE_PREFIX}${game.id}`, game, GAME_CACHE_TTL);
   }
 
-  async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string, level?: 'easy' | 'medium' | 'hard'): Promise<Game> {
+  async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string = "pl", level: 'easy' | 'medium' | 'hard' = 'medium'): Promise<Game> {
     const word = await this.getRandomWord(wordLength, language, level);
     const gameId = uuidv4();
     const newGame: Game = {
