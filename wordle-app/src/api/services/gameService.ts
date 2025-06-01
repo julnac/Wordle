@@ -4,7 +4,6 @@ import LeaderboardService from "./leaderboardService";
 import {v4 as uuidv4} from 'uuid';
 import StatsService from './statsService';
 import {Game} from "../types/Game";
-import {GuessResult} from "../types/GuessResult";
 import {LetterValidation} from "../types/LetterValidation";
 
 const GAME_CACHE_PREFIX = 'game:';
@@ -30,6 +29,13 @@ class GameService {
     return this.cacheService.getCache<Game>(`${GAME_CACHE_PREFIX}${gameId}`);
   }
 
+  private async getCurrentGameForUser(userId: string): Promise<Game | null> {
+    // Pobierz ID aktywnej gry z cache, np. user:{userId}:ongoingGame
+    const ongoingGameId = await this.cacheService.getCache<string>(`user:${userId}:ongoingGame`);
+    if (!ongoingGameId) return null;
+    return this.getGameFromCache(ongoingGameId);
+  }
+
   private async saveGameToCache(game: Game): Promise<void> {
     await this.cacheService.setCache(`${GAME_CACHE_PREFIX}${game.id}`, game, GAME_CACHE_TTL);
   }
@@ -37,18 +43,27 @@ class GameService {
   async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string = "pl", level: 'easy' | 'medium' | 'hard' = 'medium'): Promise<Game> {
     const word = await this.getRandomWord(wordLength, language, level);
     const gameId = uuidv4();
+    await this.cacheService.setCache(`user:${userId}:ongoingGame`, gameId, GAME_CACHE_TTL);
     const newGame: Game = {
       id: gameId,
       userId,
       word,
       wordLength,
       attempts: [],
+      letters: [],
       attemptsAllowed,
       status: 'ongoing',
       level,
       language,
       startTime: Date.now(),
     };
+    const existingGameId = await this.cacheService.getCache<string>(`user:${userId}:ongoingGame`);
+    if (existingGameId) {
+      const existingGame = await this.getGameFromCache(existingGameId);
+      if (existingGame && existingGame.status === 'ongoing') {
+        throw new Error('Gracz ma już aktywną grę');
+      }
+    }
     await this.saveGameToCache(newGame);
     return newGame;
   }
@@ -62,7 +77,7 @@ class GameService {
     }
   }
 
-  async submitGuess(gameId: string, guess: string): Promise<GuessResult> {
+  async submitGuess(gameId: string, guess: string): Promise<Game> {
     const game = await this.getGameFromCache(gameId);
 
     if (!game) {
@@ -81,12 +96,13 @@ class GameService {
     game.attempts.push(guess);
     const validationResult = this.validateGuessInternal(guess, game.word);
     const attemptsLeft = game.attemptsAllowed - game.attempts.length;
-    let isGameOver = false;
+    for (let i = 0; i < validationResult.letters.length; i++) {
+      game.letters.push(validationResult.letters[i]);
+    }
 
     if (validationResult.isCorrect) {
       game.status = 'completed';
       game.endTime = Date.now();
-      isGameOver = true;
       // Logika zapisu do statystyk gracza
       await StatsService.updateStats(game);
       // Logika zapisu do rankingu
@@ -94,19 +110,15 @@ class GameService {
     } else if (attemptsLeft <= 0) {
       game.status = 'failed';
       game.endTime = Date.now();
-      isGameOver = true;
+      // Logika zapisu do statystyk gracza
+      await StatsService.updateStats(game);
+      // Logika zapisu do rankingu
+      await this.leaderboardService.addScore(game);
     }
 
     await this.saveGameToCache(game);
 
-    return {
-      gameId: game.id,
-      isCorrect: validationResult.isCorrect,
-      isGameOver,
-      attemptsLeft,
-      letters: validationResult.letters,
-      gameState: game,
-    };
+    return game;
   }
 
   private validateGuessInternal(guess: string, targetWord: string): { isCorrect: boolean; letters: LetterValidation[] } {
@@ -141,6 +153,10 @@ class GameService {
 
   async getGameStatus(gameId: string): Promise<Game | null> {
     return this.getGameFromCache(gameId);
+  }
+
+  async findOngoingGameByUser(userId: string) {
+    return this.getCurrentGameForUser(userId);
   }
 
 }

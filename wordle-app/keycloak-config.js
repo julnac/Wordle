@@ -13,7 +13,7 @@ const sessionConfig = {
 const keycloakConfig = {
     clientId: 'wordle-backend-client', // Client ID z Keycloak
     bearerOnly: false, // Ustaw na true, jeśli aplikacja tylko weryfikuje tokeny, a nie inicjuje logowania
-    serverUrl: 'http://keycloak:8080/auth', // URL Twojego serwera Keycloak
+    serverUrl: 'http://localhost:8080', // URL Twojego serwera Keycloak
     realm: 'wordle-app-realm', // Nazwa Twojego realmu w Keycloak
     credentials: {
         secret: 'Muy5DgOnyOaZHKwL0rK65RpjHO6xQSIP' // Sekret klienta z Keycloak (jeśli Access Type to confidential)

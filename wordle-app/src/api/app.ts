@@ -23,7 +23,7 @@ const PORT: number = Number(process.env.PORT) || 5000;
 app.use(express.json());
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:5000'],
-  credentials: false // jeśli korzystasz z ciasteczek/sesji
+  credentials: true // jeśli korzystasz z ciasteczek/sesji
 }));
 
 // Inicjalizacja sesji (przed middleware Keycloak)
@@ -45,7 +45,7 @@ interface AuthenticatedRequest extends Request {
 // app.use('/api/auth', authRoutes);
 app.use('/api/game', keycloak.protect(), gameRoutes);
 app.use('/api/stats', keycloak.protect(), statsRoutes);
-app.use('/api/dictionary', keycloak.protect('realm:app_admin'), dictionaryRoutes);
+app.use('/api/dictionary', keycloak.protect('realm:app-admin'), dictionaryRoutes);
 app.use('/api/leaderboard', keycloak.protect(), leaderboardRoutes);
 
 app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Response) => {

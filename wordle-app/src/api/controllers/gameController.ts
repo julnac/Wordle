@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import {Game} from "../types/Game";
-import {GuessResult} from "../types/GuessResult";
 
 export default class GameController {
     private gameService: GameService;
@@ -67,7 +66,7 @@ export default class GameController {
                 return;
             }
 
-            const result: GuessResult = await this.gameService.submitGuess(gameId, guess);
+            const result: Game = await this.gameService.submitGuess(gameId, guess);
             res.status(200).json(result);
         } catch (error: any) {
             console.error(`Błąd podczas sprawdzania słowa dla gry ${req.params.gameId}:`, error);
@@ -99,6 +98,19 @@ export default class GameController {
         } catch (error: any) {
             console.error(`Błąd podczas pobierania statusu gry ${req.params.gameId}:`, error);
             res.status(500).json({ message: "Nie udało się pobrać statusu gry", error: error.message });
+        }
+    }
+
+    async getCurrentGame(req:Request, res:Response) {
+        const userId = req.params.userId;
+        try {
+            const game = await this.gameService.findOngoingGameByUser(userId);
+            if (!game) {
+                return res.status(404).json({ message: "Brak aktywnej gry" });
+            }
+            res.json(game);
+        } catch (e) {
+            res.status(500).json({ message: "Błąd serwera" });
         }
     }
 }

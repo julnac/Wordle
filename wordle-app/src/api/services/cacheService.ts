@@ -23,12 +23,6 @@ class CacheService {
         if (data === null) {
             return null;
         }
-        // Sprawdź, czy data jest typu Buffer i przekonwertuj na string, jeśli tak
-        // const jsonData = typeof data === 'string' ? data : data.toString();
-        // const jsonData = typeof data === 'string' ? data : Buffer.isBuffer(data) ? data.toString() : null;
-        // if (!jsonData) {
-        //     throw new Error('Invalid cache data format');
-        // }
         const jsonData = typeof data === 'string'
             ? data
             : Buffer.isBuffer(data)

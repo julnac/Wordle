@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
-// import { KeycloakProvider} from "@/app/components/KeycloakProvider";
+import LayoutClient from "@/components/layout/LayoutClient";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -22,9 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${lato.variable} antialiased`}>
-        {/*<KeycloakProvider>*/}
+        <LayoutClient>
           {children}
-        {/*</KeycloakProvider>*/}
+        </LayoutClient>
       </body>
     </html>
   );

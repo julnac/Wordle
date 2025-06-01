@@ -88,5 +88,21 @@ router.post('/guess/:gameId', (req, res) => gameController.validateGuess(req, re
  */
 router.get('/status/:gameId', (req, res) => gameController.getGameStatus(req, res));
 
+/**
+ * @openapi
+ * /api/game/current/{userId}:
+ *   get:
+ *     summary: Pobierz aktywną gre gracza
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Gra
+ */
+router.get('/current/:userId', (req, res) => gameController.getCurrentGame(req, res));
 export default router;
 

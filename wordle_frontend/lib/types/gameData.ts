@@ -1,16 +1,16 @@
-import {LetterValidation} from "./LetterValidation";
+import { LetterValidation } from './letterValidation';
 
-export interface Game {
+export type GameData = {
     id: string;
-    userId?: string;
+    userId: string;
     word: string;
     wordLength: number;
     attempts: string[];
     letters: LetterValidation[];
     attemptsAllowed: number;
-    status: 'ongoing' | 'completed' | 'failed';
-    level?: 'easy' | 'medium' | 'hard';
+    status: string;
+    level: string;
     language: string;
     startTime: number;
     endTime?: number;
-}
+};
