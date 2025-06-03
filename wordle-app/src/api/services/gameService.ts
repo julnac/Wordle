@@ -30,10 +30,14 @@ class GameService {
   }
 
   private async getCurrentGameForUser(userId: string): Promise<Game | null> {
-    // Pobierz ID aktywnej gry z cache, np. user:{userId}:ongoingGame
-    const ongoingGameId = await this.cacheService.getCache<string>(`user:${userId}:ongoingGame`);
-    if (!ongoingGameId) return null;
-    return this.getGameFromCache(ongoingGameId);
+    const existingGameId = await this.cacheService.getCache<string>(`user:${userId}:ongoingGame`);
+    if (existingGameId) {
+      const existingGame = await this.getGameFromCache(existingGameId);
+      if (existingGame && existingGame.status === 'ongoing') {
+        return existingGame;
+      }
+    }
+    return null;
   }
 
   private async saveGameToCache(game: Game): Promise<void> {

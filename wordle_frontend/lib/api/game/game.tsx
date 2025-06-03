@@ -26,7 +26,8 @@ export async function guessWord(gameId: string, guess: string) {
     });
 
     if (!res.ok) {
-        throw new Error("Nie udało się wysłać próby");
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Nie udało się wysłać próby");
     }
     return res.json();
 }
