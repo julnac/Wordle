@@ -10,6 +10,10 @@ export class RewardRepository {
         return prisma.reward.findUnique({ where: { id } });
     }
 
+    async findByUserId(userId: string) {
+        return prisma.reward.findMany({ where: { userId } });
+    }
+
     async findAll() {
         return prisma.reward.findMany();
     }

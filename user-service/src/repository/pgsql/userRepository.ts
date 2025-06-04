@@ -10,6 +10,10 @@ export class UserRepository {
         return prisma.user.findUnique({ where: { id } });
     }
 
+    async findByKeycloakId(keycloakId: string) {
+        return prisma.user.findUnique({ where: { keycloakId } });
+    }
+
     async findAll() {
         return prisma.user.findMany();
     }

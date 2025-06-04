@@ -10,15 +10,19 @@ export class StatsRepository {
         return prisma.stats.findUnique({ where: { id } });
     }
 
+    async findByUserId(userId: string) {
+        return prisma.stats.findUnique({ where: { userId } });
+    }
+
     async findAll() {
         return prisma.stats.findMany();
     }
 
-    async update(id: string, data: Partial<Stats>) {
-        return prisma.stats.update({ where: { id }, data });
+    async update(userId: string, data: Partial<Stats>) {
+        return prisma.stats.update({ where: { userId }, data });
     }
 
-    async delete(id: string) {
-        return prisma.stats.delete({ where: { id } });
+    async delete(userId: string) {
+        return prisma.stats.delete({ where: { userId } });
     }
 }

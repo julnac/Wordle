@@ -7,8 +7,8 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem } from "@/compon
 
 export default function Navbar() {
     const { keycloak, authenticated, profile } = useKeycloak();
-    console.log("profile:", profile);
-    console.log("tokenParsed:", keycloak?.tokenParsed);
+    // console.log("profile:", profile);
+    // console.log("tokenParsed:", keycloak?.tokenParsed);
 
     return (
         <NavigationMenu className="w-full bg-background border-b">

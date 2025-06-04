@@ -12,7 +12,7 @@ export class StatsService {
     }
 
     async updateStatsAfterGame(userId: string, won: boolean, tries: number) {
-        const stats = await this.repository.findById(userId);
+        const stats = await this.repository.findByUserId(userId);
         if (!stats) throw new Error('Stats not found');
 
         const updatedStats: Partial<Stats> = {
@@ -43,15 +43,19 @@ export class StatsService {
         return this.repository.findById(id);
     }
 
+    async getStatsByUserId(userId: string) {
+        return this.repository.findByUserId(userId);
+    }
+
     async getAllStats() {
         return this.repository.findAll();
     }
 
-    async updateStats(id: string, data: Partial<Stats>) {
-        return this.repository.update(id, data);
+    async updateStats(userId: string, data: Partial<Stats>) {
+        return this.repository.update(userId, data);
     }
 
-    async deleteStats(id: string) {
-        return this.repository.delete(id);
+    async deleteStats(userId: string) {
+        return this.repository.delete(userId);
     }
 }

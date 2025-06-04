@@ -51,6 +51,10 @@ export class RewardService {
         return this.repository.findById(id);
     }
 
+    async getRewardsByUserId(userId: string) {
+        return this.repository.findByUserId(userId);
+    }
+
     async getAllRewards() {
         return this.repository.findAll();
     }

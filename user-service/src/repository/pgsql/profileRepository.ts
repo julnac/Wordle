@@ -10,15 +10,19 @@ export class ProfileRepository {
         return prisma.profile.findUnique({ where: { id } });
     }
 
+    async findByUserId(userId: string) {
+        return prisma.profile.findUnique({ where: { userId } });
+    }
+
     async findAll() {
         return prisma.profile.findMany();
     }
 
-    async update(id: string, data: Partial<Profile>) {
-        return prisma.profile.update({ where: { id }, data });
+    async update(userId: string, data: Partial<Profile>) {
+        return prisma.profile.update({ where: { userId }, data });
     }
 
-    async delete(id: string) {
-        return prisma.profile.delete({ where: { id } });
+    async delete(userId: string) {
+        return prisma.profile.delete({ where: { userId } });
     }
 }

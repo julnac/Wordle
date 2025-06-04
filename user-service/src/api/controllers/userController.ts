@@ -12,7 +12,7 @@ export class UserController {
 
     async getProfile(req: Request, res: Response, next: NextFunction) {
         try {
-            const profile = await this.profileService.getProfileById(req.params.userId);
+            const profile = await this.profileService.getProfileByUserId(req.params.userId);
             if (!profile) {
                 res.status(404).json({ error: 'Profile not found' });
                 return;
@@ -61,7 +61,7 @@ export class UserController {
 
     async getStats(req: Request, res: Response, next: NextFunction) {
         try {
-            const stats = await this.statsService.getStatsById(req.params.userId);
+            const stats = await this.statsService.getStatsByUserId(req.params.userId);
             if (!stats) {
                 res.status(404).json({ error: 'Stats not found' });
                 return;

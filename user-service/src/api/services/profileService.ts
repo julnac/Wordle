@@ -16,15 +16,19 @@ export class ProfileService {
         return this.repository.findById(id);
     }
 
+    async getProfileByUserId(userId: string) {
+        return this.repository.findByUserId(userId);
+    }
+
     async getAllProfiles() {
         return this.repository.findAll();
     }
 
-    async updateProfile(id: string, data: Partial<Profile>) {
-        return this.repository.update(id, data);
+    async updateProfile(userId: string, data: Partial<Profile>) {
+        return this.repository.update(userId, data);
     }
 
-    async deleteProfile(id: string) {
-        return this.repository.delete(id);
+    async deleteProfile(userId: string) {
+        return this.repository.delete(userId);
     }
 }
