@@ -9,6 +9,7 @@ import { sessionConfig, keycloak } from '../keycloak-config.js';
 import proxyRoutes from './routes/proxy';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import proxy from 'express-http-proxy';
 
 
 const app: Application = express();
@@ -17,7 +18,7 @@ const PORT: number = Number(process.env.PORT) || 5000;
 app.use(express.json());
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002'],
-    credentials: true // jeśli korzystasz z ciasteczek/sesji
+    credentials: false // jeśli korzystasz z ciasteczek/sesji
 }));
 
 // Inicjalizacja sesji (przed middleware Keycloak)
@@ -33,7 +34,6 @@ interface AuthenticatedRequest extends Request {
 
 // routes
 // app.get('/', (req: Request, res: Response) => res.send('Gateway running'));
-
 app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Response) => {
     if (req.kauth && req.kauth.grant) {
         const userInfo = req.kauth.grant.access_token.content;
@@ -52,7 +52,12 @@ app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Res
 });
 
 // Protected route
-app.use('/api', keycloak.protect(), proxyRoutes);
+// app.use('/api', proxyRoutes);
+// app.use('/api', proxy('http://localhost:5002'));
+
+app.use('/user-service', proxy('http://localhost:5001'));
+app.use('/game-service', proxy('http://localhost:5002'));
+
 
 // Swagger configuration
 const swaggerOptions = {

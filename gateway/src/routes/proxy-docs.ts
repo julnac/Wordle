@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /api/dictionary/upload-file:
+ * /game-service/api/dictionary/upload-file:
  *   post:
  *     summary: Wgraj plik .txt z listą słów
  *     requestBody:
@@ -17,7 +17,7 @@
  *       200:
  *         description: Słowa zostały wgrane z pliku
  *
- * /api/dictionary/upload:
+ * /game-service/api/dictionary/upload:
  *   post:
  *     summary: Wgraj tablicę słów (JSON)
  *     requestBody:
@@ -37,7 +37,7 @@
  *       200:
  *         description: Słowa zostały wgrane
  *
- * /api/dictionary/language/{language}:
+ * /game-service/api/dictionary/language/{language}:
  *   delete:
  *     summary: Usuń wszystkie słowa dla danego języka
  *     parameters:
@@ -50,7 +50,7 @@
  *       200:
  *         description: Słowa zostały usunięte
  *
- * /api/dictionary/words:
+ * /game-service/api/dictionary/words:
  *   get:
  *     summary: Pobierz listę słów (opcjonalnie z filtrowaniem)
  *     parameters:
@@ -64,7 +64,7 @@
  *       200:
  *         description: Lista słów
  *
- * /api/dictionary/word:
+ * /game-service/api/dictionary/word:
  *   delete:
  *     summary: Usuń pojedyncze słowo
  *     requestBody:
@@ -82,21 +82,21 @@
  *       200:
  *         description: Słowo zostało usunięte
  *
- * /api/dictionary/languages:
+ * /game-service/api/dictionary/languages:
  *   get:
  *     summary: Pobierz dostępne języki
  *     responses:
  *       200:
  *         description: Lista języków
  *
- * /api/dictionary/word-counts:
+ * /game-service/api/dictionary/word-counts:
  *   get:
  *     summary: Pobierz liczbę słów wg języka
  *     responses:
  *       200:
  *         description: Liczba słów dla każdego języka
  *
- * /api/game/start/{userId}:
+ * /game-service/api/game/start/{userId}:
  *   post:
  *     summary: Rozpocznij nową grę
  *     parameters:
@@ -124,7 +124,7 @@
  *       200:
  *         description: Gra została rozpoczęta
  *
- * /api/game/guess/{gameId}:
+ * /game-service/api/game/guess/{gameId}:
  *   post:
  *     summary: Prześlij próbę odgadnięcia słowa
  *     parameters:
@@ -146,7 +146,7 @@
  *       200:
  *         description: Wynik próby
  *
- * /api/game/status/{gameId}:
+ * /game-service/api/game/status/{gameId}:
  *   get:
  *     summary: Pobierz status gry
  *     parameters:
@@ -159,7 +159,7 @@
  *       200:
  *         description: Status gry
  *
- * /api/game/current/{userId}:
+ * /game-service/api/game/current/{userId}:
  *   get:
  *     summary: Pobierz aktywną gre gracza
  *     parameters:
@@ -172,7 +172,7 @@
  *       200:
  *         description: Gra
  *
- * /api/leaderboard:
+ * /game-service/api/leaderboard:
  *   get:
  *     summary: Pobierz najlepsze wyniki dla danego języka
  *     parameters:
@@ -224,7 +224,7 @@
  *       400:
  *         description: Błędne dane gry
  *
- * /api/user/{userId}/profile:
+ * /user-service/api/user/{userId}/profile:
  *   get:
  *     summary: Pobierz profil użytkownika
  *     parameters:
@@ -256,7 +256,7 @@
  *       200:
  *         description: Zaktualizowany profil
  *
- * /api/user/{userId}/gamehistory:
+ * /user-service/api/user/{userId}/gamehistory:
  *   post:
  *     summary: Zaktualizuj historię gier użytkownika
  *     parameters:
@@ -286,7 +286,7 @@
  *       200:
  *         description: Historia gier
  *
- * /api/user/{userId}/rewards:
+ * /user-service/api/user/{userId}/rewards:
  *   get:
  *     summary: Pobierz nagrody użytkownika
  *     parameters:
@@ -299,7 +299,7 @@
  *       200:
  *         description: Lista nagród
  *
- * /api/user/{userId}/stats:
+ * /user-service/api/user/{userId}/stats:
  *   get:
  *     summary: Pobierz statystyki użytkownika
  *     parameters:
@@ -314,7 +314,7 @@
  *       404:
  *         description: Nie znaleziono statystyk
  *
- * /api/user/sync/keycloak:
+ * /user-service/api/user/sync/keycloak:
  *   post:
  *     summary: Utwórz użytkownika na podstawie danych z Keycloak
  *     requestBody:

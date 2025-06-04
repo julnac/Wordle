@@ -1,26 +1,13 @@
 import express from 'express';
-import { createProxyMiddleware } from 'http-proxy-middleware';
-
+import proxy from 'express-http-proxy';
 const router = express.Router();
 
-router.use('/user', createProxyMiddleware({
-    target: 'http://localhost:5001', // user-service
-    changeOrigin: true,
-}));
+router.use('/user', proxy('http://localhost:5001'));
 
-router.use('/game', createProxyMiddleware({
-    target: 'http://localhost:5002', // game-service
-    changeOrigin: true,
-}));
+router.use('/game', proxy('http://localhost:5002'));
 
-router.use('/dictionary', createProxyMiddleware({
-    target: 'http://localhost:5002', // game-service
-    changeOrigin: true,
-}));
+router.use('/dictionary', proxy('http://localhost:5002'));
 
-router.use('/leaderboard', createProxyMiddleware({
-    target: 'http://localhost:5002', // game-service
-    changeOrigin: true,
-}));
+router.use('/leaderboard', proxy('http://localhost:5002'));
 
 export default router;
