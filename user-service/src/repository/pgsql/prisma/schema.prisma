@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URI")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  keycloakId String   @unique
+  email      String   @unique
+  createdAt  DateTime @default(now())
+
+  profile    Profile?
+  stats      Stats?
+  rewards    Reward[]
+  gameHistory GameHistory[]
+}
+
+model Profile {
+  id        String @id @default(uuid())
+  img       String
+  bio       String
+
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String @unique
+}
+
+model Stats {
+  id             String  @id @default(uuid())
+  gamesPlayed    Int     @default(0)
+  gamesWon       Int     @default(0)
+  winRate        Float   @default(0)
+  avgTries       Float   @default(0)
+  currentStreak  Int     @default(0)
+  maxStreak      Int     @default(0)
+  lastPlayed     DateTime @default(now())
+
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String  @unique
+}
+
+model Reward {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  earnedAt    DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+}
+
+model GameHistory {
+  id             String   @id @default(uuid())
+  word           String
+  wordLength     Int
+  attempts       Json
+  attemptsAllowed Int
+  status         String
+  level          String?
+  language       String
+  startTime      DateTime
+  endTime        DateTime?
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+}
