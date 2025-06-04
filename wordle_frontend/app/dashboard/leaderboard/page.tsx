@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { getLeaderboard } from "@/lib/api/leaderboard/leaderboard";
+import { getLeaderboard } from "@/lib/api/leaderboard";
 import { Loader2 } from "lucide-react";
 
 type LeaderboardEntry = {

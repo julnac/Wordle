@@ -1,4 +1,4 @@
-import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
 
 export async function startGame(userId: string, options: {
     attemptsAllowed: number;
@@ -6,7 +6,7 @@ export async function startGame(userId: string, options: {
     language: string;
     level: string;
 }) {
-    const res = await fetchWithAuth(`/game/start/${userId}`, {
+    const res = await fetchWithAuth(`/game-service/api/game/start/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(options),
@@ -19,7 +19,7 @@ export async function startGame(userId: string, options: {
 }
 
 export async function guessWord(gameId: string, guess: string) {
-    const res = await fetchWithAuth(`/game/guess/${gameId}`, {
+    const res = await fetchWithAuth(`/game-service/api/game/guess/${gameId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ guess }),
@@ -33,7 +33,7 @@ export async function guessWord(gameId: string, guess: string) {
 }
 
 export async function getGameStatus(gameId: string) {
-    const res = await fetchWithAuth(`/game/status/${gameId}`, {
+    const res = await fetchWithAuth(`/game-service/api/game/status/${gameId}`, {
         method: "GET",
     });
 
@@ -44,7 +44,7 @@ export async function getGameStatus(gameId: string) {
 }
 
 export async function getCurrentGame(userId: string) {
-    const res = await fetchWithAuth(`/game/current/${userId}`, {
+    const res = await fetchWithAuth(`/game-service/api/game/current/${userId}`, {
         method: "GET",
     });
 

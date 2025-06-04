@@ -6,6 +6,11 @@ const repository = new UserRepository();
 export const createUserFromKeycloak = async (req: Request, res: Response, next: NextFunction) => {
     const { keycloakId, email } = req.body;
     try {
+        const existing = (await repository.findAll()).find(u => u.keycloakId === keycloakId);
+        if (existing) {
+            res.status(200).json(existing);
+            return;
+        }
         const user = await repository.create({ keycloakId, email });
         res.status(201).json(user);
     } catch (e) {
@@ -28,3 +33,12 @@ export const deleteUserFromKeycloak = async (req: Request, res: Response, next: 
         next(e);
     }
 };
+
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const users = await repository.findAll();
+        res.status(200).json(users);
+    } catch (e) {
+        next(e);
+    }
+}

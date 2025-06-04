@@ -29,7 +29,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
     // Jeśli backend jest na innym porcie/domenie, musisz podać pełny URL
     // np. const backendApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     // const fullUrl = `${backendApiUrl}${url}`;
-    const backendApiUrl = 'http://localhost:5000/api';
+    const backendApiUrl = 'http://localhost:5000';
     const fullUrl = `${backendApiUrl}${url}`;
 
     return fetch(fullUrl, { ...options, headers });

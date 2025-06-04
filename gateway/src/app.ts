@@ -5,8 +5,6 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import { sessionConfig, keycloak } from '../keycloak-config.js';
-// import { keycloak, memoryStore } from './keycloak';
-import proxyRoutes from './routes/proxy';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import proxy from 'express-http-proxy';
@@ -55,8 +53,8 @@ app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Res
 // app.use('/api', proxyRoutes);
 // app.use('/api', proxy('http://localhost:5002'));
 
-app.use('/user-service', proxy('http://localhost:5001'));
-app.use('/game-service', proxy('http://localhost:5002'));
+app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001'));
+app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002'));
 
 
 // Swagger configuration

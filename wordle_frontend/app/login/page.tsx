@@ -4,18 +4,22 @@ import Link from "next/link";
 import { useKeycloak } from "@/components/auth/KeycloakProvider";
 import { useRouter } from 'next/navigation';
 import { useEffect } from "react";
+import { createUserFromKeycloak } from "@/lib/api/user";
 
 export default function Login() {
     const { keycloak, authenticated, profile } = useKeycloak();
     const router = useRouter();
 
     useEffect(() => {
-        if (authenticated && keycloak?.authenticated) { // Sprawdź oba dla pewności
-            // Jeśli użytkownik jest już zalogowany, przekieruj go np. na stronę główną
-            // lub stronę profilu, zamiast pokazywać formularz logowania.
-            // Możesz to dostosować do swoich potrzeb.
+        if (authenticated && keycloak?.authenticated && profile) {
+            // update user info
+            createUserFromKeycloak(profile.sub, profile.email)
+                .catch((err) => {
+                    // Obsłuż błąd, np. wyświetl w konsoli
+                    console.error("Błąd tworzenia użytkownika:", err);
+                });
             console.log("User already authenticated, redirecting...");
-            router.push('/dashboard'); // Przekieruj na stronę główną
+            router.push('/dashboard');
         }
     }, [authenticated, keycloak, router]);
 

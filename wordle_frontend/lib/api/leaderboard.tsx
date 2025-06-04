@@ -1,4 +1,4 @@
-import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
 
 export async function getLeaderboard(params?: { language?: string; difficulty?: string; count?: number }) {
     const query = new URLSearchParams();
@@ -6,7 +6,7 @@ export async function getLeaderboard(params?: { language?: string; difficulty?: 
     if (params?.difficulty) query.append('difficulty', params.difficulty);
     if (params?.count) query.append('count', params.count.toString());
 
-    const res = await fetchWithAuth(`/leaderboard/?${query.toString()}`, {
+    const res = await fetchWithAuth(`/game-service/api/leaderboard/?${query.toString()}`, {
         method: "GET",
     });
 
@@ -24,7 +24,7 @@ export async function addScoreToLeaderboard(game: {
     endTime: number;
     startTime?: number;
 }) {
-    const res = await fetchWithAuth(`/leaderboard/`, {
+    const res = await fetchWithAuth(`/game-service/api/leaderboard/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(game),

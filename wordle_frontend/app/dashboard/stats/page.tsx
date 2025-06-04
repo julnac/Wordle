@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Trophy, Flame, Calendar, Timer } from "lucide-react";
-import { getUserStats } from "@/lib/api/stats/stats";
+import { getUserStats } from "@/lib/api/stats";
 import { useKeycloak } from "@/components/auth/KeycloakProvider";
 
 type UserStats = {

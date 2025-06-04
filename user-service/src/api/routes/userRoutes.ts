@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/userController';
-import { createUserFromKeycloak, deleteUserFromKeycloak } from '../controllers/userSyncController';
+import { createUserFromKeycloak, deleteUserFromKeycloak, getAllUsers } from '../controllers/userSyncController';
 
 const router = Router();
 const userController = new UserController();
@@ -166,5 +166,18 @@ router.post('/sync/keycloak', createUserFromKeycloak);
  *         description: Nie znaleziono użytkownika
  */
 router.delete('/sync/keycloak', deleteUserFromKeycloak);
+
+/**
+ * @swagger
+ * /api/user/sync/keycloak:
+ *   get:
+ *     summary: Pobierz użytkowników
+ *     responses:
+ *       200:
+ *         description: Uzytkownicy
+ *       404:
+ *         description: Nie znaleziono użytkowników
+ */
+router.get('/sync/keycloak', getAllUsers);
 
 export default router;

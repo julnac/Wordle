@@ -3,7 +3,7 @@
 import { useKeycloak } from "@/components/auth/KeycloakProvider";
 import GameBoard from "@/components/game/GameBoard";
 import { useState, useEffect } from "react";
-import { getCurrentGame, guessWord, getGameStatus, startGame } from "@/lib/api/game/game";
+import { getCurrentGame, guessWord, getGameStatus, startGame } from "@/lib/api/game";
 import { GameData } from "@/lib/types/gameData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
