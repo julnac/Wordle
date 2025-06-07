@@ -20,37 +20,6 @@ export default class DictionaryController {
         }
     }
 
-    async uploadWords(req: Request, res: Response): Promise<void> {
-        try {
-            const wordsData = req.body as IWordList[]; // Zakładamy, że body to tablica IWordList
-            if (!Array.isArray(wordsData) || wordsData.length === 0) {
-                res.status(400).json({ message: 'Oczekiwano tablicy obiektów słów w ciele żądania.' });
-                return;
-            }
-            // Podstawowa walidacja każdego obiektu słowa
-            for (const wordObj of wordsData) {
-                if (!wordObj.word || typeof wordObj.word !== 'string') {
-                    res.status(400).json({ message: 'Każdy obiekt słowa musi zawierać pole "word" typu string.' });
-                    return;
-                }
-                if (!wordObj.language || !['pl', 'en', 'es', 'de'].includes(wordObj.language)) {
-                    res.status(400).json({ message: 'Język jest obowiązkowy i musi być jednym z: pl, en, es, de.' });
-                    return;
-                }
-                if (wordObj.difficulty && !['easy', 'medium', 'hard'].includes(wordObj.difficulty)) {
-                    res.status(400).json({ message: 'Pole "difficulty" może przyjmować wartości: easy, medium, hard.' });
-                    return;
-                }
-            }
-
-            const result = await DictionaryService.uploadWords(wordsData);
-            res.status(201).json(result);
-        } catch (error) {
-            console.error("Błąd podczas przesyłania słów:", error);
-            res.status(500).json({ message: "Błąd podczas przesyłania słów", error: (error as Error).message });
-        }
-    }
-
     async deleteWordsByLanguage(req: Request, res: Response): Promise<void> {
         try {
             const { language } = req.params;
@@ -96,7 +65,11 @@ export default class DictionaryController {
             await DictionaryService.deleteWord(word, language);
             res.status(200).json({ message: `Słowo "${word}" w języku "${language}" zostało usunięte.` });
         } catch (error) {
-            res.status(500).json({ message: "Błąd podczas usuwania słowa", error: (error as Error).message });
+            if ((error as Error).message.includes('nie istnieje')) {
+                res.status(404).json({ message: (error as Error).message });
+            } else {
+                res.status(500).json({ message: "Błąd podczas usuwania słowa", error: (error as Error).message });
+            }
         }
     }
 

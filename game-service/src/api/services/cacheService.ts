@@ -47,6 +47,10 @@ class CacheService {
         await this.redisClient.zAdd(key, [{ score, value: member }], { LT: true });
     }
 
+    async zRem(key: string, member: string): Promise<void> {
+        await this.redisClient.zRem(key, member);
+    }
+
     async zRangeWithScores(key: string, start: number, stop: number): Promise<Array<{ value: string, score: number }>> {
         return this.redisClient.zRangeWithScores(key, start, stop);
     }

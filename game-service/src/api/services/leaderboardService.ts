@@ -1,5 +1,6 @@
 import {Game} from "../types/Game"; // Import interfejsu Game
 import CacheService from "./cacheService";
+import axios from "axios";
 
 const LEADERBOARD_PREFIX = 'leaderboard';
 
@@ -41,17 +42,34 @@ export default class LeaderboardService {
         try {
             // Pobierz top N wyników (od najniższego do najwyższego)
             const results = await this.cacheService.zRangeWithScores(key, 0, count - 1);
-            return results.map(r => {
+            const formated = results.map(r => {
                 const totalSeconds = Number(r.score);
                 const minutes = Math.floor(totalSeconds / 60);
                 const seconds = totalSeconds % 60;
                 const formatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 return { member: r.value.toString(), score: formatted };
             });
-            // return results.map(r => ({ member: r.value.toString(), score: Number(r.score) }));
+            for (const member of formated) {
+                const userExists = await this.checkUserExists(member.member);
+                if (!userExists) {
+                    await this.cacheService.zRem(key, member.member);
+                }
+            }
+            return formated;
         } catch (error) {
             console.error(`Failed to get top scores from ${key}:`, error);
             return [];
+        }
+    }
+
+    async checkUserExists(userId: string): Promise<boolean> {
+        try {
+            const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+            const url = `${userServiceUrl}/api/user/${userId}/profile`;
+            await axios.get(url);
+            return true;
+        } catch (error) {
+            return false;
         }
     }
 }

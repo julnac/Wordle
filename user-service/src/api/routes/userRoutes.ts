@@ -139,6 +139,8 @@ router.get('/:userId/stats', (req, res, next) => userController.getStats(req, re
  *                 type: string
  *               email:
  *                 type: string
+ *               username:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Użytkownik utworzony

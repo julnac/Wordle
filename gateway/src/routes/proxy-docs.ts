@@ -17,25 +17,6 @@
  *       200:
  *         description: Słowa zostały wgrane z pliku
  *
- * /game-service/api/dictionary/upload:
- *   post:
- *     summary: Wgraj tablicę słów (JSON)
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               words:
- *                 type: array
- *                 items:
- *                   type: string
- *               language:
- *                 type: string
- *     responses:
- *       200:
- *         description: Słowa zostały wgrane
  *
  * /game-service/api/dictionary/language/{language}:
  *   delete:
@@ -328,6 +309,8 @@
  *                 type: string
  *               email:
  *                 type: string
+ *               username:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Użytkownik utworzony
@@ -347,4 +330,11 @@
  *         description: Użytkownik usunięty
  *       404:
  *         description: Nie znaleziono użytkownika
+ *   get:
+ *     summary: Pobierz użytkowników
+ *     responses:
+ *       200:
+ *         description: Uzytkownicy
+ *       404:
+ *         description: Nie znaleziono użytkowników
  */

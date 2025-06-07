@@ -58,6 +58,38 @@ export default class WordListRepository {
         return { ...wordData, _id: result.insertedId } as IWordList;
     }
 
+    static async addWordList(words: WordListDTO[]): Promise<{
+        successfulUploads: number;
+        failedUploads: number;
+        errors: { word: string, error: any }[];
+    }> {
+        if (words.length === 0) return { successfulUploads: 0, failedUploads: 0, errors: [] };
+
+        // Pobierz wszystkie istniejące słowa dla danego języka
+        const language = words[0].language;
+        const existingWords = await getDb().collection<IWordList>(WORDLIST_COLLECTION_NAME)
+            .find({ language })
+            .project({ word: 1 })
+            .toArray();
+        const existingSet = new Set(existingWords.map(w => w.word));
+
+        // Przefiltruj duplikaty
+        const toInsert = words.filter(w => !existingSet.has(w.word));
+        const failedUploads = words.length - toInsert.length;
+        const errors = words
+            .filter(w => existingSet.has(w.word))
+            .map(w => ({ word: w.word, error: `Word "${w.word}" already exists in language "${w.language}".` }));
+
+        // Wstaw hurtowo
+        let successfulUploads = 0;
+        if (toInsert.length > 0) {
+            const result = await getDb().collection<WordListDTO>(WORDLIST_COLLECTION_NAME).insertMany(toInsert);
+            successfulUploads = result.insertedCount;
+        }
+
+        return { successfulUploads, failedUploads, errors };
+    }
+
     static async doesWordExist(word: string, language: string): Promise<boolean> {
         try {
             const result = await getDb().collection<IWordList>(WORDLIST_COLLECTION_NAME).findOne({ word, language });

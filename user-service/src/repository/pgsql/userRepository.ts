@@ -2,8 +2,25 @@ import { PrismaClient, User } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export class UserRepository {
-    async create(data: Omit<User, 'id' | 'createdAt'>) {
-        return prisma.user.create({ data });
+
+    async create (data: { keycloakId: string; email: string; username: string }) {
+        const user = await prisma.user.create({ data });
+
+        await prisma.profile.create({
+            data: {
+                userId: user.id,
+                img: '',
+                bio: '',
+            }
+        })
+
+        await prisma.stats.create({
+            data: {
+                userId: user.id,
+            }
+        });
+
+        return user;
     }
 
     async findById(id: string) {

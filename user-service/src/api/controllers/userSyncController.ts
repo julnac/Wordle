@@ -4,14 +4,14 @@ import {NextFunction, Request, Response} from 'express';
 const repository = new UserRepository();
 
 export const createUserFromKeycloak = async (req: Request, res: Response, next: NextFunction) => {
-    const { keycloakId, email } = req.body;
+    const { keycloakId, email, username } = req.body;
     try {
         const existing = (await repository.findAll()).find(u => u.keycloakId === keycloakId);
         if (existing) {
             res.status(200).json(existing);
             return;
         }
-        const user = await repository.create({ keycloakId, email });
+        const user = await repository.create({ keycloakId, email, username });
         res.status(201).json(user);
     } catch (e) {
         next(e);

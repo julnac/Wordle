@@ -13,30 +13,40 @@ export default class UploadDictService {
     //api Wgrywanie pliku txt, walidacja i zapis do bazy
     static async uploadWordsFromContent(fileContent: string): Promise<UploadResult> {
         const lines = fileContent.split('\n').filter(Boolean);
-        let successfulUploads = 0;
-        let failedUploads = 0;
+        const words: WordListDTO[] = [];
         const errors: { word: string, error: any }[] = [];
+        const allowedLanguages = ['pl', 'en', 'es', 'de'];
+        const wordRegex = /^[A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻäöüßÄÖÜáéíóúüñÁÉÍÓÚÜÑ]+$/u;
 
         for (const line of lines) {
-            try {
-                const [word, language, difficulty, category] = line.split(' ').map(s => s.trim());
-                if (!word || !language) {
-                    throw new Error('Brak wymaganych pól: word, language');
-                }
-                const wordObj: WordListDTO = {
-                    word,
-                    language,
-                    difficulty: (difficulty as 'easy' | 'medium' | 'hard') || undefined,
-                    category: category || undefined,
-                };
-                await WordListRepository.addWord(wordObj);
-                successfulUploads++;
-            } catch (error) {
-                failedUploads++;
-                errors.push({ word: line, error });
+            const [word, language, difficulty, category] = line.split(' ').map(s => s.trim());
+            if (!word || !language) {
+                // Pomijamy linie bez wymaganych pól
+                continue;
             }
+            if (!wordRegex.test(word)) {
+                errors.push({ word, error: 'Słowo może zawierać tylko litery' });
+                continue;
+            }
+            if (!allowedLanguages.includes(language)) {
+                errors.push({ word, error: `Nieprawidłowy język: ${language}` });
+                continue;
+            }
+            words.push({
+                word,
+                language,
+                difficulty: (difficulty as 'easy' | 'medium' | 'hard') || undefined,
+                category: category || undefined,
+            });
         }
-        return { successfulUploads, failedUploads, errors };
+
+        const result = await WordListRepository.addWordList(words);
+        // Dodajemy błędy z walidacji do tych z bazy
+        return {
+            successfulUploads: result.successfulUploads,
+            failedUploads: result.failedUploads + errors.length,
+            errors: [...result.errors, ...errors],
+        };
     }
 
     static async uploadWords(words: Omit<IWordList, '_id' | 'id'>[]): Promise<{
@@ -83,6 +93,10 @@ export default class UploadDictService {
 
     //api Usuwanie pojedynczego słowa
     static async deleteWord(word: string, language: string): Promise<void> {
+        const exists = await WordListRepository.doesWordExist(word, language);
+        if (!exists) {
+            throw new Error(`Słowo "${word}" w języku "${language}" nie istnieje.`);
+        }
         await WordListRepository.deleteWord(word, language);
     }
 

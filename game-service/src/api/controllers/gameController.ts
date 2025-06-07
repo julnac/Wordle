@@ -45,7 +45,9 @@ export default class GameController {
         } catch (error: any) {
             console.error("Błąd podczas rozpoczynania gry:", error);
             if (error.message.startsWith("No words found for language")) {
-                res.status(404).json({ message: error.message });
+                res.status(404).json({message: error.message});
+            } else if (error.message.startsWith("Are you a user?")) {
+                res.status(404).json({message: error.message});
             } else {
                 res.status(500).json({ message: "Nie udało się rozpocząć gry", error: error.message });
             }

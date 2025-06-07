@@ -3,7 +3,7 @@ import CacheService from "./cacheService";
 import {v4 as uuidv4} from 'uuid';
 import {Game} from "../types/Game";
 import {LetterValidation} from "../types/LetterValidation";
-// import axios from 'axios';
+import axios from 'axios';
 
 const GAME_CACHE_PREFIX = 'game:';
 const GAME_CACHE_TTL = 3600;
@@ -34,7 +34,22 @@ class GameService {
     await this.cacheService.setCache(`${GAME_CACHE_PREFIX}${game.id}`, game, GAME_CACHE_TTL);
   }
 
+  private async checkUserExists(userId: string): Promise<boolean> {
+    try {
+      const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+      const url = `${userServiceUrl}/api/user/${userId}/profile`;
+      await axios.get(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string = "pl", level: 'easy' | 'medium' | 'hard' = 'medium'): Promise<Game> {
+    const userExists = await this.checkUserExists(userId);
+    if (!userExists) {
+      throw new Error('Are you a user? Please register first.');
+    }
     const word = await this.getRandomWord(wordLength, language, level);
     const gameId = uuidv4();
     await this.cacheService.setCache(`user:${userId}:ongoingGame`, gameId, GAME_CACHE_TTL);
@@ -98,12 +113,12 @@ class GameService {
       game.status = 'completed';
       game.endTime = Date.now();
       // Logika zapisu do statystyk gracza
-      // await this.sendGameStatsToStatsService(game);
+      await this.sendGameStatsToStatsService(game);
     } else if (attemptsLeft <= 0) {
       game.status = 'failed';
       game.endTime = Date.now();
       // Logika zapisu do statystyk gracza
-      // await this.sendGameStatsToStatsService(game);
+      await this.sendGameStatsToStatsService(game);
     }
 
     await this.saveGameToCache(game);
@@ -111,13 +126,11 @@ class GameService {
     return game;
   }
 
-  // private async sendGameStatsToStatsService(game: Game) {
-  //   const statsServiceUrl = process.env.STATS_SERVICE_URL || 'http://stats-service/api/stats';
-  //   await axios.post(
-  //       statsServiceUrl,
-  //       { game },
-  //   );
-  // }
+  private async sendGameStatsToStatsService(game: Game) {
+    const statsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+    const url = `${statsServiceUrl}/api/user/${game.userId}/gamehistory`;
+    await axios.post(url, { game });
+  }
 
   private validateGuessInternal(guess: string, targetWord: string): { isCorrect: boolean; letters: LetterValidation[] } {
     const isCorrect = guess === targetWord;

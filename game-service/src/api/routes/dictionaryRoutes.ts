@@ -29,30 +29,6 @@ router.post('/upload-file', upload.single('file'), (req, res) => dictionaryContr
 
 /**
  * @openapi
- * /api/dictionary/upload:
- *   post:
- *     summary: Wgraj tablicę słów (JSON)
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               words:
- *                 type: array
- *                 items:
- *                   type: string
- *               language:
- *                 type: string
- *     responses:
- *       200:
- *         description: Słowa zostały wgrane
- */
-router.post('/upload', (req, res) => dictionaryController.uploadWords(req, res));
-
-/**
- * @openapi
  * /api/dictionary/language/{language}:
  *   delete:
  *     summary: Usuń wszystkie słowa dla danego języka
