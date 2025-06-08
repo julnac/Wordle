@@ -113,12 +113,12 @@ class GameService {
       game.status = 'completed';
       game.endTime = Date.now();
       // Logika zapisu do statystyk gracza
-      await this.sendGameStatsToStatsService(game);
+      await this.sendGameToHistory(game);
     } else if (attemptsLeft <= 0) {
       game.status = 'failed';
       game.endTime = Date.now();
       // Logika zapisu do statystyk gracza
-      await this.sendGameStatsToStatsService(game);
+      await this.sendGameToHistory(game);
     }
 
     await this.saveGameToCache(game);
@@ -126,10 +126,18 @@ class GameService {
     return game;
   }
 
-  private async sendGameStatsToStatsService(game: Game) {
-    const statsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
-    const url = `${statsServiceUrl}/api/user/${game.userId}/gamehistory`;
-    await axios.post(url, { game });
+  private async sendGameToHistory(game: Game) {
+    const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+    const url = `${userServiceUrl}/api/user/${game.userId}/gamehistory`;
+
+    const { id, ...gameData } = game;
+    const body = {
+      ...gameData,
+      startTime: new Date(game.startTime).toISOString(),
+      endTime: game.endTime ? new Date(game.endTime).toISOString() : undefined,
+    };
+
+    await axios.post(url, body);
   }
 
   private validateGuessInternal(guess: string, targetWord: string): { isCorrect: boolean; letters: LetterValidation[] } {

@@ -14,7 +14,7 @@ const PORT: number = Number(process.env.PORT) || 5001;
 // Middleware to parse JSON
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001'],
+    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002'],
     credentials: true // jeśli korzystasz z ciasteczek/sesji
 }));
 
