@@ -45,6 +45,20 @@
  *       200:
  *         description: Lista słów
  *
+ * /game-service/api/dictionary/export-file:
+ *   get:
+ *     summary: Eksportuj słowa do pliku .txt
+ *     parameters:
+ *       - in: query
+ *         name: language
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: Kod języka (np. 'pl', 'en')
+ *     responses:
+ *       200:
+ *         description: Plik z listą słów został wygenerowany
+ *
  * /game-service/api/dictionary/word:
  *   delete:
  *     summary: Usuń pojedyncze słowo

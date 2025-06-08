@@ -54,6 +54,27 @@ export default class DictionaryController {
         }
     }
 
+    // Eksport słów do pliku txt
+    async exportWordsToFile(req: Request, res: Response): Promise<void> {
+        try {
+            const { language } = req.query;
+            const filter: any = {};
+            if (language) filter.language = language;
+
+            const words = await DictionaryService.getWords(filter);
+            const lines = words.map(
+                w => [w.word, w.language, w.difficulty, w.category].filter(Boolean).join(' ')
+            );
+            const fileContent = lines.join('\n');
+
+            res.setHeader('Content-Disposition', 'attachment; filename=words.txt');
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.status(200).send(fileContent);
+        } catch (error) {
+            res.status(500).json({ message: "Błąd podczas eksportu słów", error: (error as Error).message });
+        }
+    }
+
     // Usuń pojedyncze słowo
     async deleteWord(req: Request, res: Response): Promise<void> {
         try {
