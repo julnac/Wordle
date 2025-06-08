@@ -5,7 +5,7 @@ import {Game} from "../types/Game";
 export default class GameController {
     private gameService: GameService;
 
-    constructor(gameService: any, cacheService: any) {
+    constructor(gameService: any, cacheService: any, lederboardService: any) {
         this.gameService = gameService;
     }
 

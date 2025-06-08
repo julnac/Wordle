@@ -2,13 +2,15 @@ import express, { Router } from 'express';
 import GameController from '../controllers/gameController';
 import GameService from '../services/gameService';
 import CacheService from '../services/cacheService';
+import LeaderboardService from "../services/leaderboardService";
 import { redisClient } from '../../repository/redis/redis';
 
 const router: Router = express.Router();
 
 const cacheService = new CacheService(redisClient);
-const gameService = new GameService(cacheService);
-const gameController = new GameController(gameService, cacheService);
+const leaderboardService = new LeaderboardService(cacheService);
+const gameService = new GameService(cacheService, leaderboardService);
+const gameController = new GameController(gameService, cacheService, leaderboardService);
 
 /**
  * @openapi

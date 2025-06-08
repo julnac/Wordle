@@ -42,7 +42,7 @@ export default class LeaderboardService {
         try {
             // Pobierz top N wyników (od najniższego do najwyższego)
             const results = await this.cacheService.zRangeWithScores(key, 0, count - 1);
-            const formated = results.map(r => {
+            const formated =  results.map(r => {
                 const totalSeconds = Number(r.score);
                 const minutes = Math.floor(totalSeconds / 60);
                 const seconds = totalSeconds % 60;

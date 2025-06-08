@@ -1,5 +1,6 @@
 import WordListRepository from '../../repository/mongo/wordListRepository';
 import CacheService from "./cacheService";
+import LeaderboardService from "./leaderboardService";
 import {v4 as uuidv4} from 'uuid';
 import {Game} from "../types/Game";
 import {LetterValidation} from "../types/LetterValidation";
@@ -10,9 +11,11 @@ const GAME_CACHE_TTL = 3600;
 
 class GameService {
   private cacheService: CacheService;
+  private leaderboardService: LeaderboardService;
 
-  constructor(cacheService: CacheService) {
+  constructor(cacheService: CacheService, leaderboardService: LeaderboardService) {
     this.cacheService = cacheService;
+    this.leaderboardService = leaderboardService;
   }
 
   private async getGameFromCache(gameId: string): Promise<Game | null> {
@@ -112,13 +115,17 @@ class GameService {
     if (validationResult.isCorrect) {
       game.status = 'completed';
       game.endTime = Date.now();
-      // Logika zapisu do statystyk gracza
+      // Zapis do historii,statystyk,nagród
       await this.sendGameToHistory(game);
+      // Zapis do leaderboard
+      await this.leaderboardService.addScore(game);
     } else if (attemptsLeft <= 0) {
       game.status = 'failed';
       game.endTime = Date.now();
-      // Logika zapisu do statystyk gracza
+      // Zapis do historii,statystyk,nagród
       await this.sendGameToHistory(game);
+      // Zapis do leaderboard
+      await this.leaderboardService.addScore(game);
     }
 
     await this.saveGameToCache(game);
