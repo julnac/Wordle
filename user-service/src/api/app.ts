@@ -4,6 +4,7 @@ import cors from 'cors';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import { errorHandler } from './middleware/errorHandler';
 import userRoutes from './routes/userRoutes';
+import authFromProxy from './middleware/authFromProxy';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -17,11 +18,12 @@ app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002'],
     credentials: true // jeśli korzystasz z ciasteczek/sesji
 }));
+app.use(authFromProxy);
 
 // Interfejs dla rozszerzonego obiektu Request
-interface AuthenticatedRequest extends Request {
-    kauth?: any; // Dodajemy kauth, aby TypeScript nie zgłaszał błędu
-}
+// interface AuthenticatedRequest extends Request {
+//     kauth?: any; // Dodajemy kauth, aby TypeScript nie zgłaszał błędu
+// }
 
 // Routes
 app.use('/api/user', userRoutes);

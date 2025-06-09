@@ -14,11 +14,11 @@ const gameController = new GameController(gameService, cacheService, leaderboard
 
 /**
  * @openapi
- * /api/game/start/{userId}:
+ * /api/game/start:
  *   post:
  *     summary: Rozpocznij nową grę
  *     parameters:
- *       - in: path
+ *       - in: header
  *         name: userId
  *         required: true
  *         schema:
@@ -42,7 +42,7 @@ const gameController = new GameController(gameService, cacheService, leaderboard
  *       200:
  *         description: Gra została rozpoczęta
  */
-router.post('/start/:userId',(req, res) => gameController.startGame(req, res));
+router.post('/start',(req, res) => gameController.startGame(req, res));
 
 /**
  * @openapi
@@ -102,6 +102,6 @@ router.get('/status/:gameId', (req, res) => gameController.getGameStatus(req, re
  *       200:
  *         description: Gra
  */
-router.get('/current/:userId', (req, res) => gameController.getCurrentGame(req, res));
+router.get('/current', (req, res) => gameController.getCurrentGame(req, res));
 export default router;
 

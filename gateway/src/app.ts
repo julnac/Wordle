@@ -15,8 +15,8 @@ const PORT: number = Number(process.env.PORT) || 5000;
 
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002'],
-    credentials: false // jeśli korzystasz z ciasteczek/sesji
+    origin: ['http://localhost:3000'],
+    credentials: true
 }));
 
 // Inicjalizacja sesji (przed middleware Keycloak)
@@ -53,9 +53,64 @@ app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Res
 // app.use('/api', proxyRoutes);
 // app.use('/api', proxy('http://localhost:5002'));
 
-app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001'));
-app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002'));
+// app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001'));
+// app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002'));
 
+app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001', {
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        const userInfo = (srcReq as AuthenticatedRequest).kauth?.grant?.access_token?.content;
+
+        // Upewnij się, że headers istnieje i jest typu Record<string, string>
+        if (!proxyReqOpts.headers || Array.isArray(proxyReqOpts.headers)) {
+            proxyReqOpts.headers = {};
+        }
+        const headers = proxyReqOpts.headers as Record<string, string>;
+
+        if (userInfo) {
+            headers['x-user-id'] = userInfo.sub;
+            headers['x-username'] = userInfo.preferred_username;
+            headers['x-email'] = userInfo.email;
+            headers['x-roles'] = userInfo.realm_access?.roles?.join(',') ?? '';
+        }
+
+        return proxyReqOpts;
+    }
+}));
+app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002', {
+    proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        const userInfo = (srcReq as AuthenticatedRequest).kauth?.grant?.access_token?.content;
+
+        // Upewnij się, że headers istnieje i jest typu Record<string, string>
+        if (!proxyReqOpts.headers || Array.isArray(proxyReqOpts.headers)) {
+            proxyReqOpts.headers = {};
+        }
+        const headers = proxyReqOpts.headers as Record<string, string>;
+
+        if (userInfo) {
+            headers['x-user-id'] = userInfo.sub;
+            headers['x-username'] = userInfo.preferred_username;
+            headers['x-email'] = userInfo.email;
+            headers['x-roles'] = userInfo.realm_access?.roles?.join(',') ?? '';
+        }
+
+        return proxyReqOpts;
+    }
+}));
+
+// app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002', {
+//     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+//         const userInfo = (srcReq as AuthenticatedRequest).kauth?.grant?.access_token?.content;
+//
+//         if (userInfo) {
+//             proxyReqOpts.headers['x-user-id'] = userInfo.sub;
+//             proxyReqOpts.headers['x-username'] = userInfo.preferred_username;
+//             proxyReqOpts.headers['x-email'] = userInfo.email;
+//             proxyReqOpts.headers['x-roles'] = userInfo.realm_access?.roles?.join(',') ?? '';
+//         }
+//
+//         return proxyReqOpts;
+//     }
+// }));
 
 // Swagger configuration
 const swaggerOptions = {

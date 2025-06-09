@@ -10,6 +10,7 @@ import connectMongoDB from '../repository/mongo/mongodb';
 import connectRedis from '../repository/redis/redis';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import authFromProxy from "./middleware/authFromProxy";
 
 
 const app: Application = express();
@@ -22,14 +23,16 @@ app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002'],
     credentials: true // jeśli korzystasz z ciasteczek/sesji
 }));
+app.use(authFromProxy);
 
 
 // Interfejs dla rozszerzonego obiektu Request
-interface AuthenticatedRequest extends Request {
-    kauth?: any; // Dodajemy kauth, aby TypeScript nie zgłaszał błędu
-}
+// interface AuthenticatedRequest extends Request {
+//     kauth?: any; // Dodajemy kauth, aby TypeScript nie zgłaszał błędu
+// }
 
 // Routes
+
 app.use('/api/game', gameRoutes);
 app.use('/api/dictionary', dictionaryRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);

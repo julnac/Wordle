@@ -9,9 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"
 import GameSettingsForm from "@/components/game/GameSettingsForm";
 
 export default function Game() {
@@ -27,7 +24,7 @@ export default function Game() {
 
     useEffect(() => {
         if (!profile?.id) return;
-        getCurrentGame(profile.id)
+        getCurrentGame()
             .then(data => setGameData(data))
             .catch(() => setGameData(null));
     }, [profile?.id]);
@@ -57,7 +54,7 @@ export default function Game() {
     const handleStartGame = async () => {
         if (!profile?.id) return;
         try {
-            const data = await startGame(profile.id, {
+            const data = await startGame({
                 attemptsAllowed,
                 wordLength,
                 language,

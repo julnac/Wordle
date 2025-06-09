@@ -1,10 +1,12 @@
 import express, { Router } from 'express';
 import multer from 'multer';
 import DictionaryController from '../controllers/dictionaryController';
+import requireRole from "../middleware/requireRole";
 
 const router: Router = express.Router();
 const dictionaryController = new DictionaryController();
 const upload = multer();
+// router.use(requireRole('app-admin'));
 
 /**
  * @openapi
@@ -25,7 +27,7 @@ const upload = multer();
  *       200:
  *         description: Słowa zostały wgrane z pliku
  */
-router.post('/upload-file', upload.single('file'), (req, res) => dictionaryController.uploadWordsFromFile(req, res));
+router.post('/upload-file', upload.single('file'), requireRole('app-admin'), (req, res) => dictionaryController.uploadWordsFromFile(req, res));
 
 /**
  * @openapi
@@ -42,7 +44,7 @@ router.post('/upload-file', upload.single('file'), (req, res) => dictionaryContr
  *       200:
  *         description: Słowa zostały usunięte
  */
-router.delete('/language/:language', (req, res) => dictionaryController.deleteWordsByLanguage(req, res));
+router.delete('/language/:language', requireRole('app-admin'),(req, res) => dictionaryController.deleteWordsByLanguage(req, res));
 
 /**
  * @openapi
@@ -60,7 +62,7 @@ router.delete('/language/:language', (req, res) => dictionaryController.deleteWo
  *       200:
  *         description: Lista słów
  */
-router.get('/words', (req, res) => dictionaryController.getWords(req, res));
+router.get('/words', requireRole('app-admin'), (req, res) => dictionaryController.getWords(req, res));
 
 /**
  * @openapi
@@ -78,7 +80,7 @@ router.get('/words', (req, res) => dictionaryController.getWords(req, res));
  *       200:
  *         description: Plik z listą słów został wygenerowany
  */
-router.get('/export-file', (req, res) => dictionaryController.exportWordsToFile(req, res));
+router.get('/export-file', requireRole('app-admin'), (req, res) => dictionaryController.exportWordsToFile(req, res));
 
 /**
  * @openapi
@@ -100,7 +102,7 @@ router.get('/export-file', (req, res) => dictionaryController.exportWordsToFile(
  *       200:
  *         description: Słowo zostało usunięte
  */
-router.delete('/word', (req, res) => dictionaryController.deleteWord(req, res));
+router.delete('/word', requireRole('app-admin'), (req, res) => dictionaryController.deleteWord(req, res));
 
 /**
  * @openapi

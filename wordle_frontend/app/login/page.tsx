@@ -13,7 +13,7 @@ export default function Login() {
     useEffect(() => {
         if (authenticated && keycloak?.authenticated && profile) {
             // update user info
-            createUserFromKeycloak(profile.id, profile.email)
+            createUserFromKeycloak(profile.id, profile.email, profile.username)
                 .catch((err) => {
                     // Obsłuż błąd, np. wyświetl w konsoli
                     console.error("Błąd tworzenia użytkownika:", err);

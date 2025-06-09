@@ -1,8 +1,8 @@
 import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
 
 // Pobierz profil użytkownika
-export async function getUserProfile(userId: string) {
-    const res = await fetchWithAuth(`/user-service/api/user/${userId}/profile`, {
+export async function getUserProfile() {
+    const res = await fetchWithAuth(`/user-service/api/user/profile`, {
         method: 'GET',
     });
     if (!res.ok) throw new Error('Nie udało się pobrać profilu użytkownika');
@@ -10,8 +10,8 @@ export async function getUserProfile(userId: string) {
 }
 
 // Aktualizuj profil użytkownika
-export async function updateUserProfile(userId: string, profile: any) {
-    const res = await fetchWithAuth(`/user-service/api/user/${userId}/profile`, {
+export async function updateUserProfile(profile: any) {
+    const res = await fetchWithAuth(`/user-service/api/user/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profile),

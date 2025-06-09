@@ -12,10 +12,10 @@ export default class GameController {
     async startGame(req: Request, res: Response): Promise<void> {
         try {
             const { attemptsAllowed, wordLength, language, level } = req.body;
-            const { userId } = req.params as { userId: string };
+            const userId = req.user?.userId;
 
             if (!userId) {
-                res.status(400).json({ message: "Parametr 'userId' w ścieżce jest wymagany." });
+                res.status(401).json({ message: 'User not authenticated' });
                 return;
             }
 
@@ -58,7 +58,12 @@ export default class GameController {
         try {
             const { gameId } = req.params as { gameId: string };
             const { guess } = req.body as { guess: string };
+            const userId = req.user?.userId;
 
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
             if (!guess || typeof guess !== 'string') {
                 res.status(400).json({ message: "Parametr 'guess' (string) jest wymagany." });
                 return;
@@ -68,7 +73,7 @@ export default class GameController {
                 return;
             }
 
-            const result: Game = await this.gameService.submitGuess(gameId, guess);
+            const result: Game = await this.gameService.submitGuess(gameId, guess, userId);
             res.status(200).json(result);
         } catch (error: any) {
             console.error(`Błąd podczas sprawdzania słowa dla gry ${req.params.gameId}:`, error);
@@ -103,9 +108,14 @@ export default class GameController {
         }
     }
 
-    async getCurrentGame(req:Request, res:Response): Promise<void>  {
-        const userId = req.params.userId;
+    async getCurrentGame(req: Request, res:Response): Promise<void>  {
         try {
+            const userId = req.user?.userId;
+
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
             const game = await this.gameService.findOngoingGameByUser(userId);
             if (!game) {
                 res.status(404).json({ message: "Brak aktywnej gry" });

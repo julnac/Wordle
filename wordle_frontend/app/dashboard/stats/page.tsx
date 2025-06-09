@@ -27,7 +27,7 @@ export default function Stats() {
     useEffect(() => {
         if (!profile?.id) return;
         setLoading(true);
-        getUserStats(profile.id)
+        getUserStats()
             .then(data => {
                 setStats(data);
                 setError(null);

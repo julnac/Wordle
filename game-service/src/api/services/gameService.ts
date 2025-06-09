@@ -40,8 +40,12 @@ class GameService {
   private async checkUserExists(userId: string): Promise<boolean> {
     try {
       const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
-      const url = `${userServiceUrl}/api/user/${userId}/profile`;
-      await axios.get(url);
+      const url = `${userServiceUrl}/api/user/sync/keycloak/${userId}`;
+      await axios.get(url, {
+        headers: {
+          'x-internal-service': 'true'
+        }
+      });
       return true;
     } catch (error) {
       return false;
@@ -49,6 +53,7 @@ class GameService {
   }
 
   async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string = "pl", level: 'easy' | 'medium' | 'hard' = 'medium'): Promise<Game> {
+    console.log(`Starting game: ${userId}`);
     const userExists = await this.checkUserExists(userId);
     if (!userExists) {
       throw new Error('Are you a user? Please register first.');
@@ -89,11 +94,14 @@ class GameService {
     }
   }
 
-  async submitGuess(gameId: string, guess: string): Promise<Game> {
+  async submitGuess(gameId: string, guess: string, userId: string): Promise<Game> {
     const game = await this.getGameFromCache(gameId);
 
     if (!game) {
       throw new Error('Game not found or session expired');
+    }
+    if (game.userId !== userId) {
+      throw new Error('You are not authorized to play this game');
     }
     if (game.status !== 'ongoing') {
       throw new Error('Game is already completed or failed');
@@ -144,7 +152,11 @@ class GameService {
       endTime: game.endTime ? new Date(game.endTime).toISOString() : undefined,
     };
 
-    await axios.post(url, body);
+    await axios.post(url, body, {
+      headers: {
+        'x-internal-service': 'true'
+      }
+    });
   }
 
   private validateGuessInternal(guess: string, targetWord: string): { isCorrect: boolean; letters: LetterValidation[] } {

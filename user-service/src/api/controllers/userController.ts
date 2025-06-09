@@ -12,7 +12,12 @@ export class UserController {
 
     async getProfile(req: Request, res: Response, next: NextFunction) {
         try {
-            const profile = await this.profileService.getProfileByUserId(req.params.userId);
+            const userId = req.user?.userId;
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
+            const profile = await this.profileService.getProfileByUserId(userId);
             if (!profile) {
                 res.status(404).json({ error: 'Profile not found' });
                 return;
@@ -25,7 +30,12 @@ export class UserController {
 
     async updateProfile(req: Request, res: Response, next: NextFunction) {
         try {
-            const updated = await this.profileService.updateProfile(req.params.userId, req.body);
+            const userId = req.user?.userId;
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
+            const updated = await this.profileService.updateProfile(userId, req.body);
             res.status(200).json(updated);
         } catch (e: any) {
             next(e);
@@ -43,7 +53,12 @@ export class UserController {
 
     async getGameHistory(req: Request, res: Response, next: NextFunction) {
         try {
-            const history = await this.gameHistoryService.getHistoryByUserId(req.params.userId);
+            const userId = req.user?.userId;
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
+            const history = await this.gameHistoryService.getHistoryByUserId(userId);
             res.status(200).json(history);
         } catch (e: any) {
             next(e);
@@ -52,8 +67,13 @@ export class UserController {
 
     async getRewards(req: Request, res: Response, next: NextFunction) {
         try {
+            const userId = req.user?.userId;
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
             const rewards = await this.rewardService.getAllRewards();
-            res.status(200).json(rewards.filter(r => r.userId === req.params.userId));
+            res.status(200).json(rewards.filter(r => r.userId === userId));
         } catch (e: any) {
             next(e);
         }
@@ -61,7 +81,12 @@ export class UserController {
 
     async getStats(req: Request, res: Response, next: NextFunction) {
         try {
-            const stats = await this.statsService.getStatsByUserId(req.params.userId);
+            const userId = req.user?.userId;
+            if (!userId) {
+                res.status(401).json({ message: 'User not authenticated' });
+                return;
+            }
+            const stats = await this.statsService.getStatsByUserId(userId);
             if (!stats) {
                 res.status(404).json({ error: 'Stats not found' });
                 return;

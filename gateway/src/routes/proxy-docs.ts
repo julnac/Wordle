@@ -91,15 +91,9 @@
  *       200:
  *         description: Liczba słów dla każdego języka
  *
- * /game-service/api/game/start/{userId}:
+ * /game-service/api/game/start/:
  *   post:
  *     summary: Rozpocznij nową grę
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:

@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/userController';
-import { createUserFromKeycloak, deleteUserFromKeycloak, getAllUsers } from '../controllers/userSyncController';
+import {
+    checkUserExists,
+    createUserFromKeycloak,
+    deleteUserFromKeycloak,
+    getAllUsers,
+} from '../controllers/userSyncController';
 
 const router = Router();
 const userController = new UserController();
@@ -22,7 +27,7 @@ const userController = new UserController();
  *       404:
  *         description: Nie znaleziono profilu
  */
-router.get('/:userId/profile', (req, res, next) => userController.getProfile(req, res, next));
+router.get('/profile', (req, res, next) => userController.getProfile(req, res, next));
 
 /**
  * @swagger
@@ -45,7 +50,7 @@ router.get('/:userId/profile', (req, res, next) => userController.getProfile(req
  *       200:
  *         description: Zaktualizowany profil
  */
-router.put('/:userId/profile', (req, res, next) => userController.updateProfile(req, res, next));
+router.put('/profile', (req, res, next) => userController.updateProfile(req, res, next));
 
 /**
  * @swagger
@@ -85,7 +90,7 @@ router.post('/:userId/gamehistory', (req, res, next) => userController.updateGam
  *       200:
  *         description: Historia gier
  */
-router.get('/:userId/gamehistory', (req, res, next) => userController.getGameHistory(req, res, next));
+router.get('/gamehistory', (req, res, next) => userController.getGameHistory(req, res, next));
 
 /**
  * @swagger
@@ -102,7 +107,7 @@ router.get('/:userId/gamehistory', (req, res, next) => userController.getGameHis
  *       200:
  *         description: Lista nagród
  */
-router.get('/:userId/rewards', (req, res, next) => userController.getRewards(req, res, next));
+router.get('/rewards', (req, res, next) => userController.getRewards(req, res, next));
 
 /**
  * @swagger
@@ -121,7 +126,8 @@ router.get('/:userId/rewards', (req, res, next) => userController.getRewards(req
  *       404:
  *         description: Nie znaleziono statystyk
  */
-router.get('/:userId/stats', (req, res, next) => userController.getStats(req, res, next));
+router.get('/stats', (req, res, next) => userController.getStats(req, res, next));
+
 
 /**
  * @swagger
@@ -181,5 +187,7 @@ router.delete('/sync/keycloak', deleteUserFromKeycloak);
  *         description: Nie znaleziono użytkowników
  */
 router.get('/sync/keycloak', getAllUsers);
+
+router.get('/sync/keycloak/:userId', checkUserExists);
 
 export default router;

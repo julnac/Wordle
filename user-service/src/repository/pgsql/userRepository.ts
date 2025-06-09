@@ -3,8 +3,8 @@ const prisma = new PrismaClient();
 
 export class UserRepository {
 
-    async create (data: { keycloakId: string; email: string; username: string }) {
-        const user = await prisma.user.create({ data });
+    async create (data: { id: string; email: string; username: string }) {
+        const user = await prisma.user.create({data});
 
         await prisma.profile.create({
             data: {
@@ -25,10 +25,6 @@ export class UserRepository {
 
     async findById(id: string) {
         return prisma.user.findUnique({ where: { id } });
-    }
-
-    async findByKeycloakId(keycloakId: string) {
-        return prisma.user.findUnique({ where: { keycloakId } });
     }
 
     async findAll() {

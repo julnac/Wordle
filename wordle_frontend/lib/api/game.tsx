@@ -1,12 +1,12 @@
 import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
 
-export async function startGame(userId: string, options: {
+export async function startGame(options: {
     attemptsAllowed: number;
     wordLength: number;
     language: string;
     level: string;
 }) {
-    const res = await fetchWithAuth(`/game-service/api/game/start/${userId}`, {
+    const res = await fetchWithAuth(`/game-service/api/game/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(options),
@@ -43,8 +43,8 @@ export async function getGameStatus(gameId: string) {
     return res.json();
 }
 
-export async function getCurrentGame(userId: string) {
-    const res = await fetchWithAuth(`/game-service/api/game/current/${userId}`, {
+export async function getCurrentGame() {
+    const res = await fetchWithAuth(`/game-service/api/game/current`, {
         method: "GET",
     });
 

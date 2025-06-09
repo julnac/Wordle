@@ -76,7 +76,8 @@ export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children, on
 
         keycloakInstance.init({
             onLoad: 'check-sso',
-            silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
+            silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+            checkLoginIframe: false
         })
             .then(auth => {
                 setAuthenticated(auth);

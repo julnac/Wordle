@@ -13,17 +13,6 @@ export async function uploadWordsFromFile(file: File) {
     return res.json();
 }
 
-// Wgrywanie tablicy słów (JSON)
-export async function uploadWords(words: Array<{ word: string; difficulty?: string; language: string; category?: string }>) {
-    const res = await fetchWithAuth('/game-service/api/dictionary/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(words),
-    });
-    if (!res.ok) throw new Error('Błąd podczas przesyłania słów');
-    return res.json();
-}
-
 // Usuwanie słów dla danego języka
 export async function deleteWordsByLanguage(language: string) {
     const res = await fetchWithAuth(`/game-service/api/dictionary/language/${language}`, {
@@ -70,7 +59,7 @@ export async function getLanguages() {
 }
 
 // Pobieranie liczby słów wg języka
-export async function getWordCountsByLanguage() {
+export async function getWordCounts() {
     const res = await fetchWithAuth('/game-service/api/dictionary/word-counts', {
         method: 'GET',
     });

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import DictionaryService from '../services/dictionaryService';
-import { IWordList } from '../../repository/mongo/models/wordList';
 
 export default class DictionaryController {
 

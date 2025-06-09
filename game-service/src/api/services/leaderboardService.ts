@@ -65,8 +65,13 @@ export default class LeaderboardService {
     async checkUserExists(userId: string): Promise<boolean> {
         try {
             const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
-            const url = `${userServiceUrl}/api/user/${userId}/profile`;
-            await axios.get(url);
+            const url = `${userServiceUrl}/api/user/sync/keycloak/${userId}`;
+            await axios.get(url, {
+                headers: {
+                    'x-internal-service': 'true'
+                }
+            });
+
             return true;
         } catch (error) {
             return false;

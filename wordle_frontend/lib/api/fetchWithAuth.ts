@@ -32,7 +32,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
     const backendApiUrl = 'http://localhost:5000';
     const fullUrl = `${backendApiUrl}${url}`;
 
-    return fetch(fullUrl, { ...options, headers });
+    return fetch(fullUrl, { ...options, headers, credentials: "include" });
 }
 
 // Przykład użycia w komponencie:
