@@ -4,6 +4,14 @@ import { GameHistoryService } from '../services/gameHistoryService';
 import { RewardService } from '../services/rewardService';
 import { StatsService } from '../services/statsService';
 
+interface Reward {
+    name: string
+    id: string
+    userId: string
+    description: string | null
+    earnedAt: Date
+}
+
 export class UserController {
     private profileService = new ProfileService();
     private gameHistoryService = new GameHistoryService();
@@ -72,7 +80,7 @@ export class UserController {
                 res.status(401).json({ message: 'User not authenticated' });
                 return;
             }
-            const rewards = await this.rewardService.getAllRewards();
+            const rewards: Reward[] = await this.rewardService.getAllRewards();
             res.status(200).json(rewards.filter(r => r.userId === userId));
         } catch (e: any) {
             next(e);

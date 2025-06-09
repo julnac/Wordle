@@ -1,23 +1,17 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
-
-# Set the working directory
+FROM node:18-alpine as builder
 WORKDIR /app
-
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy the rest of the application code
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Expose the port the app runs on
+FROM node:18-alpine
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=builder /app ./
 EXPOSE 3000
-
-# Start the application
 CMD ["npm", "start"]
+
+#FROM nginx:alpine
+#COPY --from=builder /app/out /usr/share/nginx/html
+#EXPOSE 3000

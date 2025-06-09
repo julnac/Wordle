@@ -1,22 +1,14 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
-
-# Set the working directory
+FROM node:18-alpine as builder
 WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
+COPY package*.json tsconfig.json ./
 RUN npm install
-
-# Copy the rest of the application code
 COPY . .
-
 RUN npm run build
 
-# Expose the port the backend runs on
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package.json ./
 EXPOSE 5002
-
-# Start the backend server
 CMD ["npm", "start"]

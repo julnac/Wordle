@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { uploadWords, deleteWordsByLanguage, uploadLanguage } from "@/lib/api/dict";
+import { deleteWordsByLanguage } from "@/lib/api/dict";
 
 const languages = [
     { label: "Polski", code: "pl" },
@@ -52,25 +52,25 @@ export default function DictionaryManager() {
     //     }
     // };
 
-    const handleImportDefault = async () => {
-        try {
-            if (!language) return toast.error("Wybierz język");
-            await uploadLanguage(language);
-            toast.success("Domyślny słownik zaimportowany");
-        } catch (err) {
-            toast.error("Błąd podczas importu domyślnego słownika");
-        }
-    };
-
-    const handleDelete = async () => {
-        try {
-            if (!language) return toast.error("Wybierz język");
-            await deleteWordsByLanguage(language);
-            toast.success("Słownik został usunięty");
-        } catch (err) {
-            toast.error("Błąd podczas usuwania słownika");
-        }
-    };
+    // const handleImportDefault = async () => {
+    //     try {
+    //         if (!language) return toast.error("Wybierz język");
+    //         await uploadLanguage(language);
+    //         toast.success("Domyślny słownik zaimportowany");
+    //     } catch (err) {
+    //         toast.error("Błąd podczas importu domyślnego słownika");
+    //     }
+    // };
+    //
+    // const handleDelete = async () => {
+    //     try {
+    //         if (!language) return toast.error("Wybierz język");
+    //         await deleteWordsByLanguage(language);
+    //         toast.success("Słownik został usunięty");
+    //     } catch (err) {
+    //         toast.error("Błąd podczas usuwania słownika");
+    //     }
+    // };
 
     return (
         <Card className="mt-6">
@@ -97,8 +97,8 @@ export default function DictionaryManager() {
 
                 <div className="flex gap-2 flex-wrap">
                     {/*<Button onClick={handleUploadWords}>📤 Prześlij własne słowa</Button>*/}
-                    <Button onClick={handleImportDefault} variant="outline">📥 Załaduj domyślne słowa</Button>
-                    <Button onClick={handleDelete} variant="destructive">🗑 Usuń słownik</Button>
+                    {/*<Button onClick={handleImportDefault} variant="outline">📥 Załaduj domyślne słowa</Button>*/}
+                    {/*<Button onClick={handleDelete} variant="destructive">🗑 Usuń słownik</Button>*/}
                 </div>
             </CardContent>
         </Card>

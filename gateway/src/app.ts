@@ -14,8 +14,9 @@ const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 5000;
 
 app.use(express.json());
+
 app.use(cors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://frontend:3000', 'http://gateway:5000'],
     credentials: true
 }));
 

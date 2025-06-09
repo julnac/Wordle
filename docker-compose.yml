@@ -1,12 +1,13 @@
 services:
   gateway:
     build: ./gateway
+    container_name: wordle-gateway
     ports:
       - "5000:5000"
+    environment:
+      PORT: 5000
     depends_on:
       - keycloak
-    environment:
-      - PORT=5000
     networks:
       - wordle-net
 
@@ -14,10 +15,11 @@ services:
     build:
       context: ./wordle_frontend
       dockerfile: Dockerfile
+    container_name: wordle-frontend
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
     depends_on:
       - gateway
     networks:
@@ -25,10 +27,12 @@ services:
 
   user-service:
     build: ./user-service
+    container_name: wordle-user-service
     ports:
       - "5001:5001"
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
+      DATABASE_URL: postgres://user123:pass123@postgres-user:5432/postgres
     depends_on:
       - postgres-user
     networks:
@@ -36,11 +40,12 @@ services:
 
   game-service:
     build: ./game-service
+    container_name: wordle-game-service
     ports:
       - "5002:5002"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/wordle
-      - REDIS_HOST=redis
+      MONGODB_URI: mongodb://mongo:27017/wordle
+      REDIS_HOST: redis
     depends_on:
       - mongo
       - redis
@@ -48,7 +53,8 @@ services:
       - wordle-net
 
   postgres-user:
-    image: postgres:15
+    image: postgres:15.13
+    container_name: wordle-postgres-user
     ports:
       - "5433:5432"
     environment:
@@ -61,7 +67,8 @@ services:
       - wordle-net
 
   mongo:
-    image: mongo:6.0
+    image: mongo:6.0.13
+    container_name: wordle-mongo
     ports:
       - "27017:27017"
     volumes:
@@ -70,7 +77,8 @@ services:
       - wordle-net
 
   redis:
-    image: redis:7.0
+    image: redis:7.0.15
+    container_name: wordle-redis
     ports:
       - "6379:6379"
     volumes:
@@ -79,7 +87,8 @@ services:
       - wordle-net
 
   postgres:
-    image: postgres:15
+    image: postgres:15.13
+    container_name: wordle-postgres
     ports:
       - "5432:5432"
     environment:
@@ -93,7 +102,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.2.4
-    container_name: keycloak
+    container_name: wordle-keycloak
     ports:
       - "8080:8080"
     environment:
@@ -104,7 +113,7 @@ services:
       KC_DB_PASSWORD: pass123
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-    command: start-dev # Dla dewelopmentu. Dla produkcji użyj 'start' i skonfiguruj bazę danych, HTTPS itp.
+    command: start-dev
     depends_on:
       - postgres
     networks:
@@ -112,13 +121,21 @@ services:
 
 volumes:
   mongo_data:
+    external: true
+    name: wordle_mongo_data
+
   postgres_data:
+    external: true
+    name: wordle_postgres_data
+
   redis_data:
+    external: true
+    name: wordle_redis_data
+
   postgres-user-data:
+    external: true
+    name: wordle_postgres-user-data
 
 networks:
   wordle-net:
     driver: bridge
-
-# docker-compose up --build
-# docker-compose up --build backend

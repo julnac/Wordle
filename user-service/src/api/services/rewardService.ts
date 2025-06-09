@@ -1,5 +1,5 @@
 import { RewardRepository } from '../../repository/pgsql/rewardRepository';
-import { Reward, Stats } from '@prisma/client';
+import { Reward, Stats} from '@prisma/client';
 
 export enum BadgeType {
     FIRST_WIN = 'FIRST_WIN',

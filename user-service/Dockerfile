@@ -1,22 +1,20 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
-
-# Set the working directory
+FROM node:18-alpine as builder
 WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
+COPY package*.json tsconfig.json ./
+COPY src/repository/pgsql/prisma ./src/repository/pgsql/prisma
 RUN npm install
-
-# Copy the rest of the application code
+RUN npx prisma generate --schema=src/repository/pgsql/prisma
 COPY . .
 
 RUN npm run build
 
-# Expose the port the backend runs on
-EXPOSE 5001
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/src/repository/pgsql/prisma ./src/repository/pgsql/prisma
 
-# Start the backend server
+COPY package.json ./
+EXPOSE 5001
 CMD ["npm", "start"]
