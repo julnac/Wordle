@@ -4,10 +4,10 @@ metadata:
   name: wordle-persistent-volume
 spec:
   capacity:
-    storage: 10Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: slow
+  storageClassName: hostpath # docker-desktop
   hostPath:
     path: /data

@@ -26,7 +26,7 @@ spec:
               value: postgres://user123:pass123@postgres-user:5432/postgres
             - name: NODE_ENV
               value: production
-          image: user-service
+          image: julpoz/wordle-user-service
           name: wordle-user-service
           ports:
             - containerPort: 5001

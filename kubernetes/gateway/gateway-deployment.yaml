@@ -24,7 +24,7 @@ spec:
         - env:
             - name: PORT
               value: "5000"
-          image: gateway
+          image: julpoz/wordle-gateway
           name: wordle-gateway
           ports:
             - containerPort: 5000
