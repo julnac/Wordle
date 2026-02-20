@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - env:
-            - name: DATABASE_URL
+            - name: POSTGRESQL_URI
               value: postgres://user123:pass123@postgres-user:5432/postgres
             - name: NODE_ENV
               value: production

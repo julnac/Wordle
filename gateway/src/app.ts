@@ -16,7 +16,16 @@ const PORT: number = Number(process.env.PORT) || 5000;
 app.use(express.json());
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://frontend:3000', 'http://gateway:5000'],
+    origin: ['http://localhost:3000',
+        'http://localhost:5000',
+        'http://localhost:5001',
+        'http://localhost:5002',
+        'http://gateway:5000',
+        'http://frontend:3000',
+        'http://user-service:5001',
+        'http://game-service:5002',
+        'http://localhost:8080',
+        'http://keycloak:8080'],
     credentials: true
 }));
 
@@ -33,7 +42,7 @@ interface AuthenticatedRequest extends Request {
 
 // routes
 // app.get('/', (req: Request, res: Response) => res.send('Gateway running'));
-app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Response) => {
+app.get('/api/profile', (req: AuthenticatedRequest, res: Response) => {
     if (req.kauth && req.kauth.grant) {
         const userInfo = req.kauth.grant.access_token.content;
         // Tutaj możesz zsynchronizować użytkownika z lokalną bazą danych, jeśli to konieczne
@@ -56,8 +65,19 @@ app.get('/api/profile', keycloak.protect(), (req: AuthenticatedRequest, res: Res
 
 // app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001'));
 // app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002'));
+// Middleware diagnostyczny — loguje nagłówek Authorization
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const auth = req.headers['authorization'];
+    if (auth) {
+        const tokenPreview = auth.substring(0, 40) + '...';
+        console.log(`[AUTH] ${req.method} ${req.path} | token: ${tokenPreview}`);
+    } else {
+        console.log(`[AUTH] ${req.method} ${req.path} | NO TOKEN`);
+    }
+    next();
+});
 
-app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001', {
+app.use('/user-service', keycloak.protect(), proxy(process.env.USER_SERVICE_URL || 'http://localhost:5001', {
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
         const userInfo = (srcReq as AuthenticatedRequest).kauth?.grant?.access_token?.content;
 
@@ -77,7 +97,7 @@ app.use('/user-service', keycloak.protect(), proxy('http://localhost:5001', {
         return proxyReqOpts;
     }
 }));
-app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002', {
+app.use('/game-service', keycloak.protect(), proxy(process.env.GAME_SERVICE_URL || 'http://localhost:5002', {
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
         const userInfo = (srcReq as AuthenticatedRequest).kauth?.grant?.access_token?.content;
 
@@ -96,6 +116,12 @@ app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002', {
 
         return proxyReqOpts;
     }
+    // userResHeaderDecorator: (headers, userReq, userRes, proxyReq, proxyRes) => {
+    //     headers['access-control-allow-origin'] = userReq.headers.origin || 'http://localhost:3000';
+    //     headers['access-control-allow-credentials'] = 'true';
+    //     // Dodaj inne nagłówki CORS jeśli potrzebujesz
+    //     return headers;
+    // }
 }));
 
 // app.use('/game-service', keycloak.protect(), proxy('http://localhost:5002', {
@@ -125,7 +151,7 @@ const swaggerOptions = {
             securitySchemes: {
                 openId: {
                     type: 'openIdConnect',
-                    openIdConnectUrl: 'http://localhost:8080/realms/wordle-app-realm/.well-known/openid-configuration'
+                    openIdConnectUrl: 'http://keycloak:8080/realms/wordle-app-realm/.well-known/openid-configuration'
                 }
             }
         },

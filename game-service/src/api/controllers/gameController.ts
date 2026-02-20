@@ -19,7 +19,7 @@ export default class GameController {
                 return;
             }
 
-            if (attemptsAllowed && (typeof attemptsAllowed !== 'number' || attemptsAllowed <= 0 || attemptsAllowed > 10)) {
+            if (attemptsAllowed && (typeof attemptsAllowed !== 'number' || attemptsAllowed < 1 || attemptsAllowed > 10)) {
                 res.status(400).json({ message: "Parametr 'attemptsAllowed' (dodatnia liczba) jest opcjonalny, ale jeśli podany, musi być między 1 a 10." });
                 return;
             }

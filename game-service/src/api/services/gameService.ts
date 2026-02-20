@@ -39,7 +39,7 @@ class GameService {
 
   private async checkUserExists(userId: string): Promise<boolean> {
     try {
-      const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:5001';
       const url = `${userServiceUrl}/api/user/sync/keycloak/${userId}`;
       await axios.get(url, {
         headers: {
@@ -142,7 +142,7 @@ class GameService {
   }
 
   private async sendGameToHistory(game: Game) {
-    const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+    const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:5001';
     const url = `${userServiceUrl}/api/user/${game.userId}/gamehistory`;
 
     const { id, ...gameData } = game;

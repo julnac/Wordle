@@ -50,3 +50,4 @@ foreach ($kind in $remainingKinds) {
 }
 
 # ./deply-k8s.ps1 powershell in kubernetes directory
+# docker build -t julpoz/wordle-gateway:latest . budowanie obrazów

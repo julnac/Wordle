@@ -42,7 +42,7 @@ const wordListSchema: Schema<IWordList> = new mongoose.Schema({
 });
 
 wordListSchema.index({ word: 1, language: 1 }, { unique: true });
-wordListSchema.index({ language: 1, difficulty: 1, category: 1 }); // szybkie filtrowanie
+wordListSchema.index({ language: 1, difficulty: 1, category: 1 });
 wordListSchema.index({ language: 1, difficulty: 1 });
 
 const WordList: Model<IWordList> = mongoose.model<IWordList>('WordList', wordListSchema);

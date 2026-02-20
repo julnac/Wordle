@@ -20,7 +20,16 @@ const PORT: number = Number(process.env.PORT) || 5002;
 // Middleware to parse JSON
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002','http://gateway:5000','http://frontend:3000','http://user-service:5001','http://game-service:5002'],
+    origin: ['http://localhost:3000',
+        'http://localhost:5000',
+        'http://localhost:5001',
+        'http://localhost:5002',
+        'http://gateway:5000',
+        'http://frontend:3000',
+        'http://user-service:5001',
+        'http://game-service:5002',
+        'http://localhost:8080',
+        'http://keycloak:8080'],
     credentials: true // jeśli korzystasz z ciasteczek/sesji
 }));
 app.use(authFromProxy);
@@ -71,3 +80,5 @@ async function startServer() {
 startServer().catch((err) => {
     console.error('Unhandled error in startServer:', err);
 });
+
+export default app;

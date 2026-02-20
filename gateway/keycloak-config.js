@@ -11,12 +11,12 @@ const sessionConfig = {
 
 // Konfiguracja Keycloak
 const keycloakConfig = {
-    clientId: 'wordle-backend-client', // Client ID z Keycloak
-    bearerOnly: false, // Ustaw na true, jeśli aplikacja tylko weryfikuje tokeny, a nie inicjuje logowania
-    serverUrl: 'http://localhost:8080', // URL Twojego serwera Keycloak
+    clientId: 'wordle-frontend-client', // ten sam client co frontend — tokeny mają aud=wordle-frontend-client
+    bearerOnly: true, // Gateway tylko weryfikuje tokeny — logowanie obsługuje frontend
+    serverUrl: process.env.KEYCLOAK_SERVER_URL || 'http://localhost:8080', // URL Twojego serwera Keycloak
     realm: 'wordle-app-realm', // Nazwa Twojego realmu w Keycloak
     credentials: {
-        secret: 'Muy5DgOnyOaZHKwL0rK65RpjHO6xQSIP' // Sekret klienta z Keycloak (jeśli Access Type to confidential)
+        secret: 'jOYxA4ximKqr7o5k6JGXaxOZxtLStYnB' // Sekret klienta z Keycloak (jeśli Access Type to confidential)
     }
 };
 

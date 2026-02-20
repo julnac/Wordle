@@ -3,7 +3,6 @@ import keycloakInstance from '@/lib/api/auth/keycloak';
 export async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
     if (!keycloakInstance || !keycloakInstance.authenticated) {
         console.warn('User not authenticated or Keycloak not initialized. Redirecting to login.');
-        // Możesz zdecydować o przekierowaniu lub rzuceniu błędu
         if (keycloakInstance) keycloakInstance.login();
         throw new Error('User not authenticated');
     }
@@ -14,9 +13,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
         await keycloakInstance.updateToken(30);
     } catch (error) {
         console.error('Failed to refresh token or user is not authenticated', error);
-        // Możesz tutaj przekierować do logowania: keycloakInstance.login();
-        // lub rzucić błąd dalej
-        keycloakInstance.login(); // Wymuś ponowne logowanie
+        keycloakInstance.login();
         throw new Error('Failed to refresh token');
     }
 
@@ -25,11 +22,8 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
         headers.set('Authorization', `Bearer ${keycloakInstance.token}`);
     }
 
-    // Zakładamy, że URL jest względny do API backendu
-    // Jeśli backend jest na innym porcie/domenie, musisz podać pełny URL
-    // np. const backendApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    // const fullUrl = `${backendApiUrl}${url}`;
-    const backendApiUrl = 'http://localhost:5000';
+    const backendApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    // const backendApiUrl = 'http://localhost:5000';
     const fullUrl = `${backendApiUrl}${url}`;
 
     return fetch(fullUrl, { ...options, headers, credentials: "include" });

@@ -12,18 +12,21 @@ import swaggerJsdoc from 'swagger-jsdoc';
 const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 5001;
 
-// Middleware to parse JSON
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5002', 'http://gateway:5000','http://frontend:3000','http://user-service:5001','http://game-service:5002'],
-    credentials: true // jeśli korzystasz z ciasteczek/sesji
+    origin: ['http://localhost:3000',
+        'http://localhost:5000',
+        'http://localhost:5001',
+        'http://localhost:5002',
+        'http://gateway:5000',
+        'http://frontend:3000',
+        'http://user-service:5001',
+        'http://game-service:5002',
+        'http://localhost:8080',
+        'http://keycloak:8080'],
+    credentials: true
 }));
 app.use(authFromProxy);
-
-// Interfejs dla rozszerzonego obiektu Request
-// interface AuthenticatedRequest extends Request {
-//     kauth?: any; // Dodajemy kauth, aby TypeScript nie zgłaszał błędu
-// }
 
 // Routes
 app.use('/api/user', userRoutes);

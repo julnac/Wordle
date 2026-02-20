@@ -1,11 +1,5 @@
 import { RedisClientType} from "redis";
 
-// interface RedisClient {
-//     setex(key: string, seconds: number, value: string): Promise<void>;
-//     get(key: string): Promise<string | null>;
-//     del(key: string): Promise<void>;
-// }
-
 class CacheService {
     private redisClient: RedisClientType;
 

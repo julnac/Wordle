@@ -27,9 +27,6 @@ export default class LeaderboardService {
         const member = `${game.userId ?? game.id}`;
 
         try {
-            // Dodaj wynik do rankingu. Jeśli gracz już jest, zaktualizuj jeśli nowy wynik jest lepszy.
-            // 'NX' - dodaj tylko jeśli nie istnieje, 'XX' - aktualizuj tylko jeśli istnieje
-            // 'LT' - aktualizuj tylko jeśli nowy wynik jest mniejszy (lepszy)
             await this.cacheService.zAdd(key, score, member);
             console.log(`Score added for game ${game.id} to ${key}: ${score}`);
         } catch (error) {
@@ -64,7 +61,7 @@ export default class LeaderboardService {
 
     async checkUserExists(userId: string): Promise<boolean> {
         try {
-            const userServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:5001';
+            const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:5001';
             const url = `${userServiceUrl}/api/user/sync/keycloak/${userId}`;
             await axios.get(url, {
                 headers: {

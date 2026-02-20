@@ -4,6 +4,7 @@ import GameService from '../services/gameService';
 import CacheService from '../services/cacheService';
 import LeaderboardService from "../services/leaderboardService";
 import { redisClient } from '../../repository/redis/redis';
+import { body } from 'express-validator';
 
 const router: Router = express.Router();
 
@@ -42,7 +43,16 @@ const gameController = new GameController(gameService, cacheService, leaderboard
  *       200:
  *         description: Gra została rozpoczęta
  */
-router.post('/start',(req, res) => gameController.startGame(req, res));
+router.post(
+    '/start',
+    [
+        body('attemptsAllowed').optional().isInt({ min: 1, max: 10 }),
+        body('wordLength').optional().isInt({ min: 4, max: 7 }),
+        body('language').optional().isIn(['pl']),
+        body('level').optional().isIn(['easy', 'medium', 'hard'])
+    ],
+    gameController.startGame.bind(gameController)
+);
 
 /**
  * @openapi

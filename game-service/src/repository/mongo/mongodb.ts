@@ -12,7 +12,7 @@ const connectMongoDB = async (): Promise<void> => {
     return;
   }
   try {
-    await mongoose.connect(mongoURI); // Usuń stare opcje
+    await mongoose.connect(mongoURI);
     dbInstance = mongoose.connection.db as Db;
     console.log('MongoDB connected successfully');
   } catch (error) {
