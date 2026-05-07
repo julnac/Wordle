@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/src/components/ui/alert";
 import GameSettingsForm from "@/src/components/game/GameSettingsForm";
 
 export default function Game() {
-    const { authenticated, profile } = useAuth();
+    const { authenticated, loading, profile } = useAuth();
     const [gameData, setGameData] = useState<GameData | null>(null);
     const [childValue, setChildValue] = useState<string>("");
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -23,11 +23,11 @@ export default function Game() {
     const [level, setLevel] = useState("medium");
 
     useEffect(() => {
-        if (!profile?.id) return;
+        if (loading || !authenticated) return;
         gameService.getCurrentGame()
             .then(data => setGameData(data))
             .catch(() => setGameData(null));
-    }, [profile?.id]);
+    }, [loading, authenticated]);
 
     useEffect(() => {
         if (!gameData || !childValue) return;
@@ -67,6 +67,14 @@ export default function Game() {
     };
 
     const handleChangesInChild = (value: string) => setChildValue(value);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+        );
+    }
 
     if (!authenticated) {
         return (

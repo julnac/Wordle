@@ -32,8 +32,7 @@ services:
   user-service:
     build: ./user-service
     container_name: wordle-user-service
-    ports:
-      - "5001:5001"
+    # port 5001 nie jest wystawiony na zewnątrz — dostępny tylko przez gateway
     environment:
       NODE_ENV: production
       POSTGRESQL_URI: postgres://user123:pass123@postgres-user:5432/postgres
@@ -46,8 +45,7 @@ services:
   game-service:
     build: ./game-service
     container_name: wordle-game-service
-    ports:
-      - "5002:5002"
+    # port 5002 nie jest wystawiony na zewnątrz — dostępny tylko przez gateway
     environment:
       MONGODB_URI: mongodb://mongo:27017/wordle
       REDIS_HOST: redis

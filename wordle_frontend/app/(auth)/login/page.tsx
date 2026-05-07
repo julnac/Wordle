@@ -10,16 +10,16 @@ import Link from "next/link";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, authenticated, loading } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (localStorage.getItem("token")) {
+        if (!loading && authenticated) {
             router.replace("/dashboard");
         }
-    }, [router]);
+    }, [loading, authenticated, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -12,6 +12,7 @@ interface AuthUser {
 interface AuthContextType {
     authenticated: boolean;
     profile: AuthUser | null;
+    loading: boolean;
     login: (token: string, user: AuthUser) => void;
     logout: () => void;
 }
@@ -19,6 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
     authenticated: false,
     profile: null,
+    loading: true,
     login: () => {},
     logout: () => {},
 });
@@ -42,6 +44,7 @@ function isTokenValid(token: string): boolean {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [authenticated, setAuthenticated] = useState(false);
     const [profile, setProfile] = useState<AuthUser | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     const login = useCallback((token: string, user: AuthUser) => {
@@ -66,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!token || !isTokenValid(token)) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            setLoading(false);
             return;
         }
 
@@ -78,10 +82,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 localStorage.removeItem('user');
             }
         }
+        setLoading(false);
     }, []);
 
     return (
-        <AuthContext.Provider value={{ authenticated, profile, login, logout }}>
+        <AuthContext.Provider value={{ authenticated, profile, loading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

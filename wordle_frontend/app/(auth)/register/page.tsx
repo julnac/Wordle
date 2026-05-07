@@ -10,17 +10,17 @@ import Link from "next/link";
 
 export default function RegisterPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, authenticated, loading } = useAuth();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (localStorage.getItem("token")) {
+        if (!loading && authenticated) {
             router.replace("/dashboard");
         }
-    }, [router]);
+    }, [loading, authenticated, router]);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
