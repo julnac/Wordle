@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
-import LayoutClient from "@/components/layout/LayoutClient";
+import Navbar from "@/src/components/Navbar";
+import { Providers } from "@/src/components/Providers";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -22,9 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${lato.variable} antialiased`}>
-        <LayoutClient>
+        <Providers>
+          <Navbar />
           {children}
-        </LayoutClient>
+        </Providers>
       </body>
     </html>
   );
