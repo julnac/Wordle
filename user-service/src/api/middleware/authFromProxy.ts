@@ -14,7 +14,7 @@ declare global {
     }
 }
 
-const AUTH_PUBLIC_PATHS = ['/api/user/auth/login', '/api/user/auth/register'];
+const AUTH_PUBLIC_PATHS = ['/api/user/auth/login', '/api/user/auth/register', '/api-docs', '/openapi.json'];
 
 const authFromProxy = (req: Request, res: Response, next: NextFunction): void => {
     if (AUTH_PUBLIC_PATHS.includes(req.path)) {

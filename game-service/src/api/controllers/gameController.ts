@@ -24,8 +24,8 @@ export default class GameController {
                 return;
             }
 
-            if (wordLength && (typeof wordLength !== 'number' || wordLength < 4 || wordLength > 7)) {
-                res.status(400).json({message: "Parametr 'wordLength' (dodatnia liczba) jest opcjonalny, ale jeśli podany, musi być między 4 a 7."});
+            if (wordLength && (typeof wordLength !== 'number' || wordLength < 5 || wordLength > 7)) {
+                res.status(400).json({message: "Parametr 'wordLength' (dodatnia liczba) jest opcjonalny, ale jeśli podany, musi być między 5 a 7."});
                 return;
             }
 
@@ -40,7 +40,8 @@ export default class GameController {
             }
 
             const game: Game = await this.gameService.startGame(userId, attemptsAllowed, wordLength, language, level);
-            res.status(201).json(game);
+            const { word: _w, ...gameWithoutWord } = game;
+            res.status(201).json(gameWithoutWord);
 
         } catch (error: any) {
             console.error("Błąd podczas rozpoczynania gry:", error);
@@ -74,12 +75,16 @@ export default class GameController {
             }
 
             const result: Game = await this.gameService.submitGuess(gameId, guess, userId);
-            res.status(200).json(result);
+            const { word, ...resultWithoutWord } = result;
+            const response = result.status === 'ongoing'
+                ? resultWithoutWord
+                : { ...resultWithoutWord, word };
+            res.status(200).json(response);
         } catch (error: any) {
             console.error(`Błąd podczas sprawdzania słowa dla gry ${req.params.gameId}:`, error);
             if (error.message === 'Game not found or session expired' || error.message === 'Game is already completed or failed') {
                 res.status(404).json({ message: error.message });
-            } else if (error.message.includes('not a valid word') || error.message.includes('Guess length must be')) {
+            } else if (error.message.includes('Guess length must be') || error.message.includes('No such word in the dictionary')) {
                 res.status(400).json({ message: error.message });
             }
             else {

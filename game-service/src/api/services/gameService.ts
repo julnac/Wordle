@@ -74,7 +74,8 @@ class GameService {
     }
   }
 
-  async submitGuess(gameId: string, guess: string, userId: string): Promise<Game> {
+  async submitGuess(gameId: string, rawGuess: string, userId: string): Promise<Game> {
+    const guess = rawGuess.toUpperCase();
     const game = await this.getGameFromCache(gameId);
 
     if (!game) {
@@ -88,9 +89,6 @@ class GameService {
     }
     if (guess.length !== game.wordLength) {
       throw new Error(`Guess length must be ${game.wordLength}`);
-    }
-    if (!await WordListRepository.doesWordExist(guess, game.language)) {
-      throw new Error('No such word in the dictionary');
     }
 
     game.attempts.push(guess);

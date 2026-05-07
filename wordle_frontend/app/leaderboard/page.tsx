@@ -6,19 +6,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/src/components/ui/card";
 import { Label } from "@/src/components/ui/label";
-import { getLeaderboard } from "@/lib/api/leaderboard";
+import { LeaderboardService } from "@/src/services/leaderboard";
 import { Loader2 } from "lucide-react";
+import { LeaderboardItem } from "@/src/types/leaderboard";
 
-type LeaderboardEntry = {
-    member: string;
-    score: string;
-};
 
 const languages = ["pl", "en", "es", "de", "fr"];
 const difficulties = ["easy", "medium", "hard"];
 
 export default function LeaderboardPage() {
-    const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+    const [entries, setEntries] = useState<LeaderboardItem[]>([]);
     const [language, setLanguage] = useState<string | undefined>("pl");
     const [difficulty, setDifficulty] = useState<string | undefined>("medium");
     const [count, setCount] = useState<number>(10);
@@ -27,7 +24,7 @@ export default function LeaderboardPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const data = await getLeaderboard({ language, difficulty, count });
+            const data = await LeaderboardService.getLeaderboard({ language, difficulty, count });
             setEntries(data);
         } catch (e) {
             console.error("Failed to fetch leaderboard", e);

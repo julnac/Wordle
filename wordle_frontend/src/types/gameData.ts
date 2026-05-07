@@ -1,4 +1,5 @@
-import { LetterValidation } from '../../lib/types/letterValidation';
+import { LetterValidation } from './letterValidation';
+import { User } from './user';
 
 export type GameData = {
     id: string;
@@ -14,3 +15,26 @@ export type GameData = {
     startTime: number;
     endTime?: number;
 };
+
+export interface GameHistory {
+  id: string;
+  word: string;
+  wordLength: number;
+  attempts: unknown; // Prisma Json → najlepiej zawęzić później
+  attemptsAllowed: number;
+  status: string;
+  level?: string | null;
+  language: string;
+  startTime: Date;
+  endTime?: Date | null;
+
+  userId: string;
+  user?: User;
+}
+
+export interface StartGameRequest {
+  attemptsAllowed: number;
+  wordLength: number;
+  language: string;
+  level: string;
+}

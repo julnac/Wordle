@@ -1,10 +1,10 @@
-import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
+import apiClient from "./apiClient";
+import { Stats } from "../types/stats";
 
-// Pobierz statystyki użytkownika
-export async function getUserStats() {
-    const res = await fetchWithAuth(`/user-service/api/user/stats`, {
-        method: 'GET',
-    });
-    if (!res.ok) throw new Error('Nie udało się pobrać statystyk');
-    return res.json();
-}
+export const userStatsService = {
+
+    getUserStats: async (): Promise<Stats> => {
+        const response = await apiClient.get<Stats>('/user-service/api/user/stats');
+        return response.data;
+    }
+};

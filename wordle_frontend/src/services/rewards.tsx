@@ -1,10 +1,10 @@
-import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
+import apiClient from "./apiClient";
+import { Reward } from '../types/reward';
 
-// Pobierz nagrody użytkownika
-export async function getUserRewards() {
-    const res = await fetchWithAuth(`/user-service/api/user/rewards`, {
-        method: 'GET',
-    });
-    if (!res.ok) throw new Error('Nie udało się pobrać nagród');
-    return res.json();
-}
+export const RewardsService = {
+
+    getRewards: async (): Promise<Reward[]> => {
+        const response = await apiClient.get<Reward[]>('/user-service/api/user/rewards');
+        return response.data;
+    }
+};

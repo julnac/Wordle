@@ -3,7 +3,6 @@ dotenv.config();
 
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import proxy from 'express-http-proxy';
 import { requireAuth } from './auth';
@@ -38,8 +37,21 @@ interface AuthenticatedRequest extends Request {
     kauth?: any;
 }
 
-app.get('/api/profile', requireAuth, (req: AuthenticatedRequest, res: Response) => {
-    const userInfo = req.kauth?.grant?.access_token?.content;
+/**
+ * @openapi
+ * /api/profile:
+ *   get:
+ *     summary: Get current user profile from JWT
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile
+ *       401:
+ *         description: Not authenticated
+ */
+app.get('/api/profile', requireAuth, (req: Request, res: Response) => {
+    const userInfo = (req as AuthenticatedRequest).kauth?.grant?.access_token?.content;
     if (userInfo) {
         res.json({
             username: userInfo.preferred_username,
@@ -127,9 +139,23 @@ const swaggerOptions = {
         },
         security: [{ bearerAuth: [] }]
     },
-    apis: ['./src/routes/*.ts'],
+    apis: ['./dist/app.js'],
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/openapi.json', (_req, res) => { res.json(swaggerSpec); });
+app.get('/api-docs', (_req, res) => {
+    res.send(`<!doctype html>
+<html>
+  <head>
+    <title>Wordle Gateway API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <script id="api-reference" data-url="/openapi.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  </body>
+</html>`);
+});
 
 app.listen(PORT, () => console.log(`Gateway on port ${PORT}`));

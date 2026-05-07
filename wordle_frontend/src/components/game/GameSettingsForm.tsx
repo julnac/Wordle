@@ -39,8 +39,8 @@ export default function GameSettingsForm({
     };
 
     const validateWordLength = (value: number) => {
-        if (value < 4 || value > 7) {
-            setWordLengthError("Długość słowa musi być między 4 a 7.");
+        if (value < 5 || value > 7) {
+            setWordLengthError("Długość słowa musi być między 5 a 7.");
         } else {
             setWordLengthError("");
             setWordLength(value);
@@ -80,9 +80,6 @@ export default function GameSettingsForm({
                     <SelectContent>
                         <SelectItem value="pl">Polski</SelectItem>
                         <SelectItem value="en">Angielski</SelectItem>
-                        <SelectItem value="es">Hiszpański</SelectItem>
-                        <SelectItem value="de">Niemiecki</SelectItem>
-                        <SelectItem value="fr">Francuski</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/src/components/auth/AuthProvider";
+import { useAuth } from "@/src/providers/AuthProvider";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@/src/components/ui/navigation-menu";
 
 export default function Navbar() {
@@ -11,7 +11,7 @@ export default function Navbar() {
             <div className="container mx-auto flex justify-between items-center py-3">
                 <NavigationMenuList className="flex items-center">
                     <NavigationMenuItem>
-                        <NavigationMenuLink  href="/" className="text-xl font-bold">WordleApp</NavigationMenuLink >
+                        <NavigationMenuLink  href={authenticated ? '/' : '/dashboard'} className="text-xl font-bold">WordleApp</NavigationMenuLink >
                     </NavigationMenuItem>
                 </NavigationMenuList>
                 <NavigationMenuList className="flex items-center gap-2">
@@ -22,12 +22,12 @@ export default function Navbar() {
                     )}
                     {authenticated && (
                         <NavigationMenuItem>
-                            <NavigationMenuLink href="/dashboard/game" className="text-sm">Play</NavigationMenuLink>
+                            <NavigationMenuLink href="/game" className="text-sm">Play</NavigationMenuLink>
                         </NavigationMenuItem>
                     )}
                     {authenticated && (
                         <NavigationMenuItem>
-                            <NavigationMenuLink href="/dashboard/leaderboard" className="text-sm">Leaderboard</NavigationMenuLink>
+                            <NavigationMenuLink href="/leaderboard" className="text-sm">Leaderboard</NavigationMenuLink>
                         </NavigationMenuItem>
                     )}
                     {!authenticated && (
@@ -48,5 +48,3 @@ export default function Navbar() {
         </NavigationMenu>
     );
 }
-
-{/*<Button onClick={() => keycloak.login()}>Login</Button>*/}

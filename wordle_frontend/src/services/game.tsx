@@ -1,55 +1,26 @@
-import { fetchWithAuth } from '@/lib/api/fetchWithAuth';
+import apiClient from "./apiClient";
+import{ StartGameRequest, GameData } from '../types/gameData';
 
-export async function startGame(options: {
-    attemptsAllowed: number;
-    wordLength: number;
-    language: string;
-    level: string;
-}) {
-    const res = await fetchWithAuth(`/game-service/api/game/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(options),
-    });
+export const gameService = {
 
-    if (!res.ok) {
-        throw new Error("Nie udało się rozpocząć gry");
-    }
-    return res.json();
-}
+    startGame: async (options: StartGameRequest): Promise<GameData> => {
+        const response = await apiClient.post<GameData>('/game-service/api/game/start', options);
+        return response.data;
+    },
 
-export async function guessWord(gameId: string, guess: string) {
-    const res = await fetchWithAuth(`/game-service/api/game/guess/${gameId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ guess }),
-    });
+    guessWord: async (gameId: string, guess: string): Promise<GameData> => {
+        const response = await apiClient.post<GameData>(`/game-service/api/game/guess/${gameId}`, { guess });
+        return response.data;
+    },
 
-    if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Nie udało się wysłać próby");
-    }
-    return res.json();
-}
+    getGameStatus: async (gameId: string): Promise<GameData> => {
+        const response = await apiClient.get<GameData>(`/game-service/api/game/status/${gameId}`);
+        return response.data;
+    },
 
-export async function getGameStatus(gameId: string) {
-    const res = await fetchWithAuth(`/game-service/api/game/status/${gameId}`, {
-        method: "GET",
-    });
+    getCurrentGame: async (): Promise<GameData> => {
+        const response = await apiClient.get<GameData>(`/game-service/api/game/current`);
+        return response.data;
+    },
 
-    if (!res.ok) {
-        throw new Error("Nie udało się pobrać statusu gry");
-    }
-    return res.json();
-}
-
-export async function getCurrentGame() {
-    const res = await fetchWithAuth(`/game-service/api/game/current`, {
-        method: "GET",
-    });
-
-    if (!res.ok) {
-        throw new Error("Nie udało się pobrać bieżącej gry");
-    }
-    return res.json();
-}
+};

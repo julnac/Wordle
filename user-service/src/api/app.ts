@@ -7,7 +7,6 @@ import userRoutes from './routes/userRoutes';
 import authFromProxy from './middleware/authFromProxy';
 import { seed } from '../seed';
 
-import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
 const app: Application = express();
@@ -37,17 +36,41 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Wordle API',
+            title: 'Wordle User Service API',
             version: '1.0.0',
         },
+        servers: [
+            { url: 'http://localhost:5000/user-service', description: 'Via gateway' },
+        ],
         components: {
-            securitySchemes: {}
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
         },
+        security: [{ bearerAuth: [] }],
     },
-    apis: ['./src/api/routes/*.ts'],
+    apis: ['./dist/api/routes/*.js'],
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/openapi.json', (_req, res) => { res.json(swaggerSpec); });
+app.get('/api-docs', (_req, res) => {
+    res.send(`<!doctype html>
+<html>
+  <head>
+    <title>Wordle User Service API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <script id="api-reference" data-url="/openapi.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  </body>
+</html>`);
+});
 
 // Error handling middleware
 app.use(errorHandler);

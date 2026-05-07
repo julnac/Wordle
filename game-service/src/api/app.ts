@@ -8,9 +8,9 @@ import dictionaryRoutes from './routes/dictionaryRoutes';
 import leaderboardRoutes from './routes/leaderboardRoutes';
 import connectMongoDB from '../repository/mongo/mongodb';
 import connectRedis from '../repository/redis/redis';
-import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import authFromProxy from "./middleware/authFromProxy";
+import { seedDictionary } from '../seed';
 
 
 const app: Application = express();
@@ -27,9 +27,7 @@ app.use(cors({
         'http://gateway:5000',
         'http://frontend:3000',
         'http://user-service:5001',
-        'http://game-service:5002',
-        'http://localhost:8080',
-        'http://keycloak:8080'],
+        'http://game-service:5002'],
     credentials: true // jeśli korzystasz z ciasteczek/sesji
 }));
 app.use(authFromProxy);
@@ -51,23 +49,49 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Wordle API',
+            title: 'Wordle Game Service API',
             version: '1.0.0',
         },
+        servers: [
+            { url: 'http://localhost:5000/game-service', description: 'Via gateway (wymagane)' },
+        ],
         components: {
-            securitySchemes: {}
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
         },
+        security: [{ bearerAuth: [] }],
     },
-    apis: ['./src/api/routes/*.ts'],
+    apis: ['./dist/api/routes/*.js'],
 };
+
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.get('/openapi.json', (_req, res) => { res.json(swaggerSpec); });
+    app.get('/api-docs', (_req, res) => {
+        res.send(`<!doctype html>
+    <html>
+    <head>
+        <title>Wordle Game Service API</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+        <script id="api-reference" data-url="/openapi.json"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    </body>
+    </html>`);
+});
 
 
 async function startServer() {
     try {
         await connectMongoDB();
         await connectRedis();
+        await seedDictionary();
 
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
@@ -77,8 +101,10 @@ async function startServer() {
     }
 }
 
-startServer().catch((err) => {
-    console.error('Unhandled error in startServer:', err);
-});
+if (process.env.NODE_ENV !== 'test') {
+    startServer().catch((err) => {
+        console.error('Unhandled error in startServer:', err);
+    });
+}
 
 export default app;

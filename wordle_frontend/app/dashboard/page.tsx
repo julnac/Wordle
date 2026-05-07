@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/src/components/auth/AuthProvider";
+import { useAuth } from "@/src/providers/AuthProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 import { Trophy, Flame, BarChart, Gamepad2 } from "lucide-react";
-import { getUserStats } from "@/lib/api/stats";
-import { UserStats } from "@/src/types/UserStats";
+import { userStatsService } from "@/src/services/stats";
+import { Stats } from "@/src/types/stats";
 
 export default function Dashboard() {
     const { profile } = useAuth();
-    const [stats, setStats] = useState<UserStats | null>(null);
+    const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {
-        getUserStats()
-            .then(setStats)
+        userStatsService.getUserStats()
+            .then(data => setStats(data ?? null))
             .catch(() => null);
     }, []);
 
@@ -69,12 +69,6 @@ export default function Dashboard() {
             <div className="flex gap-4">
                 <Button asChild size="lg">
                     <Link href="/dashboard/game">Zagraj teraz</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                    <Link href="/dashboard/stats">Statystyki</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                    <Link href="/dashboard/leaderboard">Tabela wyników</Link>
                 </Button>
             </div>
         </div>

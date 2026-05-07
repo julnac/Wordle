@@ -1,3 +1,13 @@
+jest.mock('../../src/repository/mongo/mongodb', () => jest.fn().mockResolvedValue(undefined));
+jest.mock('../../src/repository/redis/redis', () => ({
+    __esModule: true,
+    default: jest.fn().mockResolvedValue(undefined),
+    redisClient: { on: jest.fn() },
+}));
+jest.mock('../../src/seed', () => ({
+    seedDictionary: jest.fn().mockResolvedValue(undefined),
+}));
+
 // import request from 'supertest';
 const request = require('supertest');
 import app from '../../src/api/app';

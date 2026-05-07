@@ -6,7 +6,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 import { toast } from "sonner";
-import { deleteWordsByLanguage } from "@/lib/api/dict";
+import { deleteWordsByLanguage } from "@/src/services/dict";
 
 const languages = [
     { label: "Polski", code: "pl" },

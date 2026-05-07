@@ -47,8 +47,8 @@ router.post(
     '/start',
     [
         body('attemptsAllowed').optional().isInt({ min: 1, max: 10 }),
-        body('wordLength').optional().isInt({ min: 4, max: 7 }),
-        body('language').optional().isIn(['pl']),
+        body('wordLength').optional().isInt({ min: 5, max: 7 }),
+        body('language').optional().isIn(['pl', 'en']),
         body('level').optional().isIn(['easy', 'medium', 'hard'])
     ],
     gameController.startGame.bind(gameController)

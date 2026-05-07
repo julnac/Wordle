@@ -5,7 +5,56 @@ import { register, login } from '../controllers/authController';
 const router = Router();
 const userController = new UserController();
 
+/**
+ * @swagger
+ * /api/user/auth/register:
+ *   post:
+ *     summary: Zarejestruj nowego użytkownika
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, email, password]
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Użytkownik zarejestrowany
+ *       409:
+ *         description: Użytkownik już istnieje
+ */
 router.post('/auth/register', register);
+
+/**
+ * @swagger
+ * /api/user/auth/login:
+ *   post:
+ *     summary: Zaloguj użytkownika
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Token JWT
+ *       401:
+ *         description: Nieprawidłowe dane logowania
+ */
 router.post('/auth/login', login);
 
 

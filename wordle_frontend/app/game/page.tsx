@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuth } from "@/src/components/auth/AuthProvider";
+import { useAuth } from "@/src/providers/AuthProvider";
 import GameBoard from "@/src/components/game/GameBoard";
 import { useState, useEffect } from "react";
-import { getCurrentGame, guessWord, getGameStatus, startGame } from "@/lib/api/game";
+import { gameService} from "@/src/services/game";
 import { GameData } from "@/src/types/gameData";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
@@ -24,14 +24,14 @@ export default function Game() {
 
     useEffect(() => {
         if (!profile?.id) return;
-        getCurrentGame()
+        gameService.getCurrentGame()
             .then(data => setGameData(data))
             .catch(() => setGameData(null));
     }, [profile?.id]);
 
     useEffect(() => {
         if (!gameData || !childValue) return;
-        guessWord(gameData.id, childValue)
+        gameService.guessWord(gameData.id, childValue)
             .then(data => {
                 if (data.status === "completed") {
                     setGameData(data);
@@ -54,7 +54,7 @@ export default function Game() {
     const handleStartGame = async () => {
         if (!profile?.id) return;
         try {
-            const data = await startGame({
+            const data = await gameService.startGame({
                 attemptsAllowed,
                 wordLength,
                 language,
@@ -90,7 +90,7 @@ export default function Game() {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-2xl">🎯 Wordle Game</CardTitle>
-                    <p className="text-muted-foreground text-sm">Witaj, {profile?.username}! Powodzenia!</p>
+                    <p className="text-muted-foreground text-sm">Witaj, {profile?.username}. Powodzenia!</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <GameSettingsForm
@@ -122,7 +122,7 @@ export default function Game() {
                                 gameData={gameData}
                                 onChangeInChildAction={handleChangesInChild}
                             />
-                            <pre>{JSON.stringify(gameData, null, 2)}</pre>
+                            {/* <pre>{JSON.stringify(gameData, null, 2)}</pre> */}
                         </div>
                     )}
                 </CardContent>
