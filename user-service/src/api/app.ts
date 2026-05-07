@@ -5,6 +5,7 @@ import express, { Application } from 'express';
 import { errorHandler } from './middleware/errorHandler';
 import userRoutes from './routes/userRoutes';
 import authFromProxy from './middleware/authFromProxy';
+import { seed } from '../seed';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -14,7 +15,8 @@ const PORT: number = Number(process.env.PORT) || 5001;
 
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000',
+    origin: [
+        'http://localhost:3000',
         'http://localhost:5000',
         'http://localhost:5001',
         'http://localhost:5002',
@@ -22,8 +24,7 @@ app.use(cors({
         'http://frontend:3000',
         'http://user-service:5001',
         'http://game-service:5002',
-        'http://localhost:8080',
-        'http://keycloak:8080'],
+    ],
     credentials: true
 }));
 app.use(authFromProxy);
@@ -51,8 +52,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Error handling middleware
 app.use(errorHandler);
 
-function startServer() {
+async function startServer() {
     try {
+        await seed();
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
@@ -61,4 +63,4 @@ function startServer() {
     }
 }
 
-startServer()
+startServer();

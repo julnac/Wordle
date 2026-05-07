@@ -37,30 +37,16 @@ class GameService {
     await this.cacheService.setCache(`${GAME_CACHE_PREFIX}${game.id}`, game, GAME_CACHE_TTL);
   }
 
-  private async checkUserExists(userId: string): Promise<boolean> {
-    try {
-      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:5001';
-      const url = `${userServiceUrl}/api/user/sync/keycloak/${userId}`;
-      await axios.get(url, {
-        headers: {
-          'x-internal-service': 'true'
-        }
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
   async startGame(userId: string, attemptsAllowed: number = 6, wordLength: number = 5, language: string = "pl", level: 'easy' | 'medium' | 'hard' = 'medium'): Promise<Game> {
     console.log(`Starting game: ${userId}`);
-    const userExists = await this.checkUserExists(userId);
-    if (!userExists) {
-      throw new Error('Are you a user? Please register first.');
+
+    const existingGame = await this.getCurrentGameForUser(userId);
+    if (existingGame) {
+      throw new Error('Gracz ma już aktywną grę');
     }
+
     const word = await this.getRandomWord(wordLength, language, level);
     const gameId = uuidv4();
-    await this.cacheService.setCache(`user:${userId}:ongoingGame`, gameId, GAME_CACHE_TTL);
     const newGame: Game = {
       id: gameId,
       userId,
@@ -74,14 +60,8 @@ class GameService {
       language,
       startTime: Date.now(),
     };
-    const existingGameId = await this.cacheService.getCache<string>(`user:${userId}:ongoingGame`);
-    if (existingGameId) {
-      const existingGame = await this.getGameFromCache(existingGameId);
-      if (existingGame && existingGame.status === 'ongoing') {
-        throw new Error('Gracz ma już aktywną grę');
-      }
-    }
     await this.saveGameToCache(newGame);
+    await this.cacheService.setCache(`user:${userId}:ongoingGame`, gameId, GAME_CACHE_TTL);
     return newGame;
   }
 

@@ -14,13 +14,18 @@ declare global {
     }
 }
 
+const AUTH_PUBLIC_PATHS = ['/api/user/auth/login', '/api/user/auth/register'];
+
 const authFromProxy = (req: Request, res: Response, next: NextFunction): void => {
+    if (AUTH_PUBLIC_PATHS.includes(req.path)) {
+        return next();
+    }
+
     const userId = req.header('x-user-id');
     const rolesHeader = req.header('x-roles');
     const isInternal = req.header('x-internal-service') === 'true';
 
     if (isInternal) {
-        // Pomijamy uwierzytelnianie dla zapytań wewnętrznych
         return next();
     }
 

@@ -8,9 +8,7 @@ services:
       PORT: 5000
       USER_SERVICE_URL: http://user-service:5001
       GAME_SERVICE_URL: http://game-service:5002
-      KEYCLOAK_SERVER_URL: http://keycloak:8080
-    depends_on:
-      - keycloak
+      JWT_SECRET: super-secret-key-change-in-production
     networks:
       - wordle-net
 
@@ -18,13 +16,14 @@ services:
     build:
       context: ./wordle_frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5000
     container_name: wordle-frontend
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: http://localhost:5000
-      KEYCLOAK_SERVER_URL: http://keycloak:8080
     depends_on:
       - gateway
     networks:
@@ -37,7 +36,8 @@ services:
       - "5001:5001"
     environment:
       NODE_ENV: production
-      POSTGRESQL_URI: postgres://user123:pass123@postgres-user:5433/postgres
+      POSTGRESQL_URI: postgres://user123:pass123@postgres-user:5432/postgres
+      JWT_SECRET: super-secret-key-change-in-production
     depends_on:
       - postgres-user
     networks:
@@ -93,45 +93,9 @@ services:
     networks:
       - wordle-net
 
-  postgres:
-    image: postgres:15.13
-    container_name: wordle-postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: user123
-      POSTGRES_PASSWORD: pass123
-      POSTGRES_DB: keycloak
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - wordle-net
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.2.4
-    container_name: wordle-keycloak
-    ports:
-      - "8080:8080"
-    environment:
-      KC_DB: postgres
-      KC_DB_URL_HOST: postgres
-      KC_DB_URL_DATABASE: keycloak
-      KC_DB_USERNAME: user123
-      KC_DB_PASSWORD: pass123
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    command: start-dev
-    depends_on:
-      - postgres
-    networks:
-      - wordle-net
-
 volumes:
   mongo_data:
     name: wordle_mongo_data
-
-  postgres_data:
-    name: wordle_postgres_data
 
   redis_data:
     name: wordle_redis_data
@@ -141,6 +105,5 @@ volumes:
 
 networks:
   wordle-net:
+    name: wordle_network
     driver: bridge
-
-# docker-compose up --build

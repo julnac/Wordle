@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/userController';
-import {
-    checkUserExists,
-    createUserFromKeycloak,
-    deleteUserFromKeycloak,
-    getAllUsers,
-} from '../controllers/userSyncController';
+import { register, login } from '../controllers/authController';
 
 const router = Router();
 const userController = new UserController();
+
+router.post('/auth/register', register);
+router.post('/auth/login', login);
+
 
 /**
  * @swagger
@@ -128,66 +127,5 @@ router.get('/rewards', (req, res, next) => userController.getRewards(req, res, n
  */
 router.get('/stats', (req, res, next) => userController.getStats(req, res, next));
 
-
-/**
- * @swagger
- * /api/user/sync/keycloak:
- *   post:
- *     summary: Utwórz użytkownika na podstawie danych z Keycloak
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               keycloakId:
- *                 type: string
- *               email:
- *                 type: string
- *               username:
- *                 type: string
- *     responses:
- *       201:
- *         description: Użytkownik utworzony
- */
-router.post('/sync/keycloak', createUserFromKeycloak);
-
-/**
- * @swagger
- * /api/user/sync/keycloak:
- *   delete:
- *     summary: Usuń użytkownika na podstawie danych z Keycloak
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               keycloakId:
- *                 type: string
- *     responses:
- *       204:
- *         description: Użytkownik usunięty
- *       404:
- *         description: Nie znaleziono użytkownika
- */
-router.delete('/sync/keycloak', deleteUserFromKeycloak);
-
-/**
- * @swagger
- * /api/user/sync/keycloak:
- *   get:
- *     summary: Pobierz użytkowników
- *     responses:
- *       200:
- *         description: Uzytkownicy
- *       404:
- *         description: Nie znaleziono użytkowników
- */
-router.get('/sync/keycloak', getAllUsers);
-
-router.get('/sync/keycloak/:userId', checkUserExists);
 
 export default router;
