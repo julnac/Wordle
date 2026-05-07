@@ -5,13 +5,8 @@ export interface UserInfo {
     roles: string[];
 }
 
-// Rozszerzamy Request, aby dodać `user`
-declare global {
-    namespace Express {
-        interface Request {
-            user?: UserInfo;
-        }
-    }
+export interface AuthRequest extends Request {
+    user?: UserInfo;
 }
 
 const AUTH_PUBLIC_PATHS = ['/api-docs', '/openapi.json'];
@@ -29,7 +24,7 @@ const authFromProxy = (req: Request, res: Response, next: NextFunction): void =>
         return;
     }
 
-    req.user = {
+    (req as AuthRequest).user = {
         userId,
         roles: rolesHeader.split(','),
     };

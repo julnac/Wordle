@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { AuthRequest } from '../middleware/authFromProxy';
 import { ProfileService } from '../services/profileService';
 import { GameHistoryService } from '../services/gameHistoryService';
 import { RewardService } from '../services/rewardService';
@@ -20,7 +21,7 @@ export class UserController {
 
     async getProfile(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
                 return;
@@ -38,7 +39,7 @@ export class UserController {
 
     async updateProfile(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
                 return;
@@ -61,7 +62,7 @@ export class UserController {
 
     async getGameHistory(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
                 return;
@@ -75,7 +76,7 @@ export class UserController {
 
     async getRewards(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
                 return;
@@ -89,7 +90,7 @@ export class UserController {
 
     async getStats(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
                 return;

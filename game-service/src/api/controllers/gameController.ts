@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import {Game} from "../types/Game";
+import { AuthRequest } from "../middleware/authFromProxy";
 
 export default class GameController {
     private gameService: GameService;
@@ -12,7 +13,7 @@ export default class GameController {
     async startGame(req: Request, res: Response): Promise<void> {
         try {
             const { attemptsAllowed, wordLength, language, level } = req.body;
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
 
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
@@ -59,7 +60,7 @@ export default class GameController {
         try {
             const { gameId } = req.params as { gameId: string };
             const { guess } = req.body as { guess: string };
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
 
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
@@ -115,7 +116,7 @@ export default class GameController {
 
     async getCurrentGame(req: Request, res:Response): Promise<void>  {
         try {
-            const userId = req.user?.userId;
+            const userId = (req as AuthRequest).user?.userId;
 
             if (!userId) {
                 res.status(401).json({ message: 'User not authenticated' });
